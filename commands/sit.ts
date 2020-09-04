@@ -4,12 +4,12 @@ import config from "../config";
 
 const { COMMAND_PREFIX } = config;
 
-export const command = ["sit [seat]", "join"];
+export const command = ["sit [seat] [buy-in]", "join"];
 
 export const description = "Join the current game.";
 
 export const builder = yargs => yargs
-  .positional("seat-number", {
+  .positional("seat", {
     description: "Which seat you'd like to take.",
     type: "number"
   })
@@ -18,7 +18,7 @@ export const builder = yargs => yargs
     type: "number"
   });
 
-export async function handler ({ discord, buyIn, seatNumber }) {
+export async function handler ({ discord, buyIn, seat }) {
   const message = discord.message as Message;
   if (message.channel.type === "dm") {
     message.reply("This command can only be run from a channel or server.");
@@ -35,7 +35,7 @@ export async function handler ({ discord, buyIn, seatNumber }) {
     return;
   }
   try {
-    table.sitDown(message.author.id, buyIn || table.buyIn, seatNumber ? seatNumber - 1: undefined);
+    table.sitDown(message.author.id, buyIn || table.buyIn, seat ? seat - 1: undefined);
     await Promise.all([table.saveToDb(), table.render()]);
   } catch (err) {
     message.reply(err.message);

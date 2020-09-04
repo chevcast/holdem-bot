@@ -20,7 +20,6 @@ export default (cmdInput, context) => {
   const yargs = Yargs();
 
   yargs
-    .alias("help", "h")
     .commandDir("commands", {
       extensions: ["js", "ts"]
     })
@@ -29,6 +28,7 @@ export default (cmdInput, context) => {
       if (!err) return;
       onFail(err, channel);
     })
+    .help(false)
     .parserConfiguration({
       "strip-aliased": true,
       "strip-dashed": true,

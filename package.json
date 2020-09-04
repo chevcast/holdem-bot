@@ -33,9 +33,12 @@
     "type": "git",
     "url": "git+https://github.com/chevtek/holdem-bot.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Chev",
+    "email": "chev@chevtek.io",
+    "url": "https://chevtek.io"
+  },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/chevtek/holdem-bot/issues"
   },

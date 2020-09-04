@@ -77,11 +77,11 @@ export class ChannelTable extends Table {
 
   async playRandomSound (directory: string) {
     if (!this.sound) return;
-    const tableCreator = this.channel.guild?.members.cache.get(this.creatorId);
     if (this.voiceTimeout) {
       clearTimeout(this.voiceTimeout);
       delete this.voiceTimeout;
     }
+    const tableCreator = this.channel.guild?.members.cache.get(this.creatorId);
     if ((!this.voiceConnection || this.voiceConnection.status === 4) && tableCreator?.voice.channel) {
       this.voiceConnection = await tableCreator?.voice.channel.join();
     } else if (this.voiceConnection && !tableCreator?.voice.channel) {
