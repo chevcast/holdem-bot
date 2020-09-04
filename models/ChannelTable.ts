@@ -119,10 +119,10 @@ export class ChannelTable extends Table {
         "pokerTable.png"
       );
       const gameEmbed = new MessageEmbed()
-        .setTitle("No-limit Hold'em!")
+        .setTitle(`Hold'em Table - #${this.channel.name}`)
         .setDescription(`
           **Buy-in:** ${formatMoney(this.buyIn)}
-          **Players:** ${this.players.length}
+          **Players:** ${this.players.filter(player => player !== null).length}
 
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
