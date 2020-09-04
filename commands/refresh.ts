@@ -10,7 +10,7 @@ export async function handler ({ discord }) {
   const message = discord.message as Message;
   let table = await ChannelTable.findByChannelId(message.channel.id);
   if (!table) {
-    table = await ChannelTable.findByCreatorId(message.author.id);
+    table = await ChannelTable.findByPlayerId(message.author.id);
     if (!table) {
       if (message.channel.type === "dm") {
         message.reply("You do not have an active Hold'em table.");

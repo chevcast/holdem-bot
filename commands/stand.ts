@@ -9,7 +9,7 @@ export async function handler ({ discord }) {
   const message = discord.message as Message;
   let table = await ChannelTable.findByChannelId(message.channel.id);
   if (!table) {
-    table = await ChannelTable.findByCreatorId(message.author.id);
+    table = await ChannelTable.findByPlayerId(message.author.id);
     if (!table) {
       if (message.channel.type === "dm") {
         message.reply("You do not have an active Hold'em table.");
@@ -31,6 +31,7 @@ export async function handler ({ discord }) {
     if (!["yes", "y"].includes(collected.first()!.content.toLowerCase())) return;
     table.standUp(message.author.id);
     await Promise.all([table.saveToDb(), table.render()]);
+    message.reply("You have left your active Hold'em table.");
   } catch (err) {
     message.reply("No confirmation received. You are still playing!");
   }

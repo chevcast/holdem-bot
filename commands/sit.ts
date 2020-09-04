@@ -29,8 +29,8 @@ export async function handler ({ discord, buyIn, seat }) {
     message.reply("There is no active Hold'em game in this channel.");
     return;
   }
-  const existingTable = await ChannelTable.findByCreatorId(message.author.id);
-  if (existingTable && existingTable.channel.id !== table.channel.id) {
+  const existingTable = await ChannelTable.findByPlayerId(message.author.id);
+  if (!table.debug && existingTable && existingTable.channel.id !== table.channel.id) {
     message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Chevbot PM to leave your active table.`);
     return;
   }

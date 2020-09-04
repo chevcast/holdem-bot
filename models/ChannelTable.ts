@@ -268,13 +268,13 @@ export class ChannelTable extends Table {
     return table.populateFromDoc(doc);
   }
 
-  static async findByCreatorId(creatorId: string) {
+  static async findByPlayerId(playerId: string) {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
-    const { resources: [doc] } = await pokerTables.items.query({
-      query: "SELECT * FROM root r WHERE r.creatorId=@creatorId",
+    const { resources: [{ c: doc }] } = await pokerTables.items.query({
+      query: "SELECT DISTINCT c FROM c JOIN pc IN c.players WHERE pc.id IN (@playerId)",
       parameters: [
-        { name: "@creatorId", value: creatorId }
+        { name: "@playerId", value: playerId }
       ]
     }).fetchAll();
     if (!doc) return;
