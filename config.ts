@@ -8,7 +8,8 @@ enum ConfigProperties {
   DISCORD_BOT_TOKEN,
   DISCORD_CLIENT_ID,
   DISCORD_CLIENT_SECRET,
-  PORT
+  PORT,
+  RARE_SOUND_SKIP_FRACTION
 };
 
 export default Object.keys(ConfigProperties).reduce((config, key) => {

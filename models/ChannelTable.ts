@@ -20,7 +20,10 @@ import discordClient from "../discord-client";
 
 const readDir = util.promisify(fs.readdir);
 
-const { COMMAND_PREFIX } = config;
+const {
+  COMMAND_PREFIX,
+  RARE_SOUND_SKIP_FRACTION
+} = config;
 
 export class ChannelTable extends Table {
 
@@ -96,9 +99,8 @@ export class ChannelTable extends Table {
     }, 60000);
     if (!this.voiceConnection) return;
     const files = (await readDir(directory)).filter(file => file !== "rare");
-    const skipFraction = 2;
     let soundPath = path.join(directory, files[Math.floor(Math.random() * files.length)]);
-    if (Math.floor(Math.random() * skipFraction) === 0) {
+    if (Math.floor(Math.random() * parseInt(RARE_SOUND_SKIP_FRACTION)) === 0) {
       try {
         const rareFiles = await readDir(path.join(directory, "rare"));
         if (rareFiles.length > 0) {
