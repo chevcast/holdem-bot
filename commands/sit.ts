@@ -4,7 +4,7 @@ import config from "../config";
 
 const { COMMAND_PREFIX } = config;
 
-export const command = ["sit [seat-number] [buy-in]", "join"];
+export const command = ["sit [seat]", "join"];
 
 export const description = "Join the current game.";
 
