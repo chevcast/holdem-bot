@@ -2,13 +2,9 @@ import { MessageEmbed, Message } from "discord.js";
 
 import fs from "fs";
 import util from "util";
-import config from "../config";
 import discordClient from "../discord-client";
-import { help } from "yargs";
 
 const readFile = util.promisify(fs.readFile);
-
-const { COMMAND_PREFIX } = config;
 
 export const command = ["help", "h"];
 

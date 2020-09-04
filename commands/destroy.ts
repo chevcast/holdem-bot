@@ -19,10 +19,10 @@ export async function handler ({ discord }) {
       return;
     }
   }
-  if (table.creatorId !== message.author.id) {
-    message.reply("Only the table creator can destroy the table.");
-    return;
-  }
+  // if (table.creatorId !== message.author.id) {
+  //   message.reply("Only the table creator can destroy the table.");
+  //   return;
+  // }
   try {
     message.reply("Are you sure? Type `CONFIRM` to destroy the table.");
     await message.channel.awaitMessages(

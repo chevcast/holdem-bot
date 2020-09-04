@@ -64,10 +64,11 @@ export async function handler (argv) {
         gameLoop(table);
       }
       return;
-    } else if (table.creatorId !== message.author.id) {
-      message.reply("Only the creator of the table can reset it.");
-      return;
     }
+    // } else if (table.creatorId !== message.author.id) {
+    //   message.reply("Only the creator of the table can reset it.");
+    //   return;
+    // }
     try {
       message.reply("Are you sure? Type `CONFIRM` to reset the table.");
       await message.channel.awaitMessages(

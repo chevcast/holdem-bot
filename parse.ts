@@ -6,11 +6,12 @@ const { COMMAND_PREFIX } = config;
 
 const onFail = (err, channel) => {
   const errorEmbed = new MessageEmbed()
-    .attachFiles(["./images/error-chip.png"])
+    .attachFiles(["./images/error-chip.png", "./images/chevtek.png"])
     .setTitle("Something went wrong...")
     .setColor(0xff0000)
     .setDescription(`\`\`\`${err?.stack ?? err.toString()}\`\`\``)
     .setThumbnail("attachment://error-chip.png")
+    .setFooter("Created by Chevtek", "attachment://chevtek.png");
   channel.send(errorEmbed);
 };
 

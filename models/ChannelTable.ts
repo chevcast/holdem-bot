@@ -92,6 +92,7 @@ export class ChannelTable extends Table {
       this.voiceConnection?.disconnect();
       delete this.voiceConnection;
       delete this.voiceTimeout;
+      console.log("Voice connection timeout.");
     }, 60000);
     if (!this.voiceConnection) return;
     const files = (await readDir(directory)).filter(file => file !== "rare");
@@ -123,9 +124,10 @@ export class ChannelTable extends Table {
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
         .setColor(0x00ff00)
-        .attachFiles([pokerTable])
         .setImage("attachment://pokerTable.png")
-        .setFooter(`"${COMMAND_PREFIX}help" for more options.`);
+        .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
+        .attachFiles([pokerTable, "./images/chevtek.png"])
+        .setFooter("Created by Chevtek", "attachment://chevtek.png");
       const sidePots = this.sidePots;
       if (sidePots) {
         gameEmbed.addFields(sidePots.map((pot, index) => {
