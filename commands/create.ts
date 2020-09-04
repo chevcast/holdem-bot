@@ -98,6 +98,8 @@ export async function handler (argv) {
   );
   table.sound = sound;
   table.debug = debug;
+  // Do not auto move dealer. We want to manually move the dealer after a win.
+  table.autoMoveDealer = false;
   table.sitDown(message.author.id, buyIn || table.buyIn);
   await Promise.all([table.saveToDb(), table.render()]);
 }

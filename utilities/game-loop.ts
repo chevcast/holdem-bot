@@ -6,6 +6,9 @@ import Yargs from "yargs/yargs";
 import formatMoney from "./format-money";
 import { BettingRound } from "@chevtek/poker-engine";
 import { ChannelTable, ActionEmoji } from "../models";
+import config from "../config";
+
+const { COMMAND_PREFIX } = config;
 
 export default async function (table: ChannelTable) {
 
@@ -216,7 +219,14 @@ export default async function (table: ChannelTable) {
         // Re-render table and delete any active prompt.
         delete table.prompt;
         await table.render();
-        if (table.winners) table.cleanUp();
+        if (table.winners) {
+          table.cleanUp();
+          // Manually move dealer after a win so we can tell who the next dealer is and allow them to issue the deal command.
+          table.moveDealer(table.dealerPosition! + 1)
+          const dealer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
+          const channel = dealer.dmChannel || await dealer.createDM();
+          channel.send(`<@${dealer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
+        }
         await table.saveToDb();
 
       } catch (err) {
