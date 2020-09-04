@@ -33,6 +33,10 @@ export async function handler ({ discord }) {
     await Promise.all([table.saveToDb(), table.render()]);
     message.reply("You have left your active Hold'em table.");
   } catch (err) {
-    message.reply("No confirmation received. You are still playing!");
+    if (!err.message) {
+      message.reply("No confirmation received. You are still playing!");
+    } else {
+      message.reply(err.message);
+    }
   }
 }

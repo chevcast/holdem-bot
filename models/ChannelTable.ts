@@ -147,7 +147,6 @@ export class ChannelTable extends Table {
       return gameEmbed;
     };
     await this.channel.send(await generateGameEmbed());
-    if (!this.currentRound && this.handNumber === 0) return;
     if (this.debug) {
       this.players.forEach(player => {
         if (!player) return;
@@ -155,6 +154,8 @@ export class ChannelTable extends Table {
       });
       const user = this.channel.guild!.members.cache.get(this.creatorId)!.user;
       await user.send(await generateGameEmbed());
+      return;
+    } else if (!this.currentRound && this.handNumber === 0) {
       return;
     }
     for (let index = 0; index < this.players.length; index++) {
