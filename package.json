@@ -5,7 +5,7 @@
   "main": "main.ts",
   "dependencies": {
     "@azure/cosmos": "^3.9.1",
-    "@chevtek/poker-engine": "^1.1.0",
+    "@chevtek/poker-engine": "^1.1.1",
     "@discordjs/opus": "^0.3.2",
     "canvas": "^2.6.1",
     "discord.js": "^12.3.1",
