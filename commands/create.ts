@@ -1,6 +1,9 @@
 import { Message, TextChannel } from "discord.js";
 import { gameLoop } from "../utilities";
 import { ChannelTable } from "../models";
+import config from "../config";
+
+const { COMMAND_PREFIX } = config;
 
 export const command = ["create", "poker", "holdem"];
 
@@ -65,10 +68,6 @@ export async function handler (argv) {
       }
       return;
     }
-    // } else if (table.creatorId !== message.author.id) {
-    //   message.reply("Only the creator of the table can reset it.");
-    //   return;
-    // }
     try {
       message.reply("Are you sure? Type `CONFIRM` to reset the table.");
       await message.channel.awaitMessages(
@@ -84,6 +83,11 @@ export async function handler (argv) {
       message.reply("No confirmation received. The table was not reset.");
       return;
     }
+  }
+  const existingTable = await ChannelTable.findByPlayerId(message.author.id);
+  if (existingTable && (!table || table.channel.id !== existingTable.channel.id)) {
+    message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
+    return;
   }
   table = new ChannelTable(
     message.author.id,

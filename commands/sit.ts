@@ -21,7 +21,7 @@ export const builder = yargs => yargs
 export async function handler ({ discord, buyIn, seat }) {
   const message = discord.message as Message;
   if (message.channel.type === "dm") {
-    message.reply("This command can only be run from a channel or server.");
+    message.reply("This command can only be run from a channel on a server.");
     return;
   }
   const table = await ChannelTable.findByChannelId(message.channel.id);
@@ -30,8 +30,8 @@ export async function handler ({ discord, buyIn, seat }) {
     return;
   }
   const existingTable = await ChannelTable.findByPlayerId(message.author.id);
-  if (!table.debug && existingTable && existingTable.channel.id !== table.channel.id) {
-    message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Chevbot PM to leave your active table.`);
+  if (existingTable && table.channel.id !== existingTable.channel.id) {
+    message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
     return;
   }
   try {

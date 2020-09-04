@@ -17,6 +17,7 @@ import { Prompt } from "./Prompt";
 import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
+import { resourceUsage } from "process";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -271,13 +272,14 @@ export class ChannelTable extends Table {
   static async findByPlayerId(playerId: string) {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
-    const { resources: [{ c: doc }] } = await pokerTables.items.query({
+    const { resources } = await pokerTables.items.query({
       query: "SELECT DISTINCT c FROM c JOIN pc IN c.players WHERE pc.id IN (@playerId)",
       parameters: [
         { name: "@playerId", value: playerId }
       ]
     }).fetchAll();
-    if (!doc) return;
+    if (!resources || resources.length === 0) return;
+    const [{ c: doc }] = resources;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
     const table = new ChannelTable(doc.creatorId, channel);
     return table.populateFromDoc(doc);

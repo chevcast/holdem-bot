@@ -7,22 +7,15 @@ export const description = "Destroy the current table for this channel.";
 
 export async function handler ({ discord }) {
   const message = discord.message as Message;
+  if (message.channel.type === "dm") {
+    message.reply("This command can only be run from a channel on a server.");
+    return;
+  }
   let table = await ChannelTable.findByChannelId(message.channel.id);
   if (!table) {
-    table = await ChannelTable.findByPlayerId(message.author.id);
-    if (!table) {
-      if (message.channel.type === "dm") {
-        message.reply("You do not have an active Hold'em table.");
-      } else {
-        message.reply("There is no active Hold'em game in this channel.");
-      }
-      return;
-    }
+    message.reply("There is no active Hold'em game in this channel.");
+    return;
   }
-  // if (table.creatorId !== message.author.id) {
-  //   message.reply("Only the table creator can destroy the table.");
-  //   return;
-  // }
   try {
     message.reply("Are you sure? Type `CONFIRM` to destroy the table.");
     await message.channel.awaitMessages(
