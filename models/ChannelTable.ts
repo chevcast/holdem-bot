@@ -9,7 +9,6 @@ import {
   TextChannel,
   Collection,
   MessageReaction,
-  Channel
 } from "discord.js";
 import { Table, Card, Player, Pot } from "@chevtek/poker-engine";
 import { renderPokerTable } from "../drawing-utils";
@@ -96,7 +95,7 @@ export class ChannelTable extends Table {
     }, 60000);
     if (!this.voiceConnection) return;
     const files = (await readDir(directory)).filter(file => file !== "rare");
-    const skipFraction = 30;
+    const skipFraction = 2;
     let soundPath = path.join(directory, files[Math.floor(Math.random() * files.length)]);
     if (Math.floor(Math.random() * skipFraction) === 0) {
       try {
@@ -153,8 +152,8 @@ export class ChannelTable extends Table {
       await user.send(await generateGameEmbed());
       return;
     }
-    for (let index = 0; index < this.activePlayers.length; index++) {
-      const player = this.activePlayers[index];
+    for (let index = 0; index < this.players.length; index++) {
+      const player = this.players[index];
       if (!player) continue;
       const oldValue = player.showCards;
       player.showCards = true;
