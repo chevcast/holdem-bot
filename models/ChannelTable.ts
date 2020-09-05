@@ -99,7 +99,7 @@ export class ChannelTable extends Table {
       delete this.voiceConnection;
       delete this.voiceTimeout;
       console.log("Voice connection timeout.");
-    }, 60000);
+    }, 3 * 60 * 1000);
     if (!this.voiceConnection) return;
     const files = (await readDir(directory)).filter(file => file !== "rare");
     let soundPath = path.join(directory, files[Math.floor(Math.random() * files.length)]);
