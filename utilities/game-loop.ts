@@ -233,7 +233,7 @@ export default async function (table: ChannelTable) {
         await table.render();
         const user = table.channel.guild.members.cache.get(player.id)!.user;
         const channel = user.dmChannel || await user.createDM();
-        channel.send(`<@${player.id}>, ${err.stack || err.message || err}`);
+        channel.send(`<@${player.id}>, ${err.message}`);
       }
     }
   })();
