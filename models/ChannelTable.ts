@@ -17,7 +17,7 @@ import { Prompt } from "./Prompt";
 import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
-import { resourceUsage } from "process";
+import { table } from "console";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -25,6 +25,8 @@ const {
   COMMAND_PREFIX,
   RARE_SOUND_SKIP_FRACTION
 } = config;
+
+const tableCache: {[key: string]: Table} = {};
 
 export class ChannelTable extends Table {
 
@@ -172,8 +174,12 @@ export class ChannelTable extends Table {
   saveToDb() {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to save poker table. No database container.");
+    if (!tableCache[this.channel.id]) {
+      tableCache[this.channel.id] = this;
+    }
     const doc = {
       id: this.channel.id,
+      autoMoveDealer: this.autoMoveDealer,
       bigBlind: this.bigBlind,
       bigBlindPosition: this.bigBlindPosition,
       buyIn: this.buyIn,
@@ -224,6 +230,9 @@ export class ChannelTable extends Table {
   deleteFromDb () {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to delete table. No container found.");
+    if (tableCache[this.channel.id]) {
+      delete tableCache[this.channel.id];
+    }
     return pokerTables.item(this.channel.id).delete();
   }
 
@@ -263,16 +272,29 @@ export class ChannelTable extends Table {
   static async findByChannelId(channelId: string) {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
+    if (tableCache[channelId]) {
+      return tableCache[channelId];
+    }
     const { resource: doc } = await pokerTables.item(channelId).read();
     if (!doc) return;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
-    const table = new ChannelTable(doc.creatorId, channel);
-    return table.populateFromDoc(doc);
+    const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
+    if (!tableCache[channelId]) {
+      tableCache[channelId] = table;
+    }
+    return table;
   }
 
   static async findByPlayerId(playerId: string) {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
+    for (const channelId in tableCache) {
+      const table = tableCache[channelId];
+      const playerMatches = table.players.filter(player => player && player.id === playerId);
+      if (playerMatches.length > 0) {
+        return table;
+      }
+    }
     const { resources } = await pokerTables.items.query({
       query: "SELECT DISTINCT c FROM c JOIN pc IN c.players WHERE pc.id IN (@playerId)",
       parameters: [
@@ -282,7 +304,10 @@ export class ChannelTable extends Table {
     if (!resources || resources.length === 0) return;
     const [{ c: doc }] = resources;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
-    const table = new ChannelTable(doc.creatorId, channel);
-    return table.populateFromDoc(doc);
+    const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
+    if (!tableCache[channel.id]) {
+      tableCache[channel.id] = table;
+    }
+    return table;
   }
 }
