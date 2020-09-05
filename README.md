@@ -1,6 +1,6 @@
 Welcome to Hold'em Bot!
 
-Check out the commands below to begin!
+Check out the commands below to begin!  
 If you have any issues please submit them [here](https://github.com/chevtek/holdem-bot/issues).
 
 ---------------
