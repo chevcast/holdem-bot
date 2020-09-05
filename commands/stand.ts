@@ -29,6 +29,9 @@ export async function handler ({ discord }) {
       { max: 1, time: 20000, errors: ["time"] }
     );
     if (!["yes", "y"].includes(collected.first()!.content.toLowerCase())) return;
+    if (table.currentActor?.id === message.author.id){
+      table.prompt?.resolve?.();
+    }
     table.standUp(message.author.id);
     await Promise.all([table.saveToDb(), table.render()]);
     message.reply("You have left your active Hold'em table.");
