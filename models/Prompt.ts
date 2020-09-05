@@ -2,9 +2,6 @@ import {
   CollectorFilter,
   AwaitReactionsOptions,
   AwaitMessagesOptions,
-  Collection,
-  Message,
-  MessageReaction
 } from "discord.js";
 
 export enum ActionEmoji {
@@ -28,6 +25,8 @@ export interface Prompt {
     filter: CollectorFilter,
     options: AwaitMessagesOptions
   },
+  remainingTime?: number,
+  timerIntervalId?: NodeJS.Timeout,
   promise?: Promise<string | undefined>,
   resolve?: (value?: string | PromiseLike<string | undefined> | undefined) => void,
   reject?: (reason?: any) => void

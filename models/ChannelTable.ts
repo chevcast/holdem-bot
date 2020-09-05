@@ -33,7 +33,7 @@ export class ChannelTable extends Table {
   voiceTimeout?: NodeJS.Timeout;
   prompt?: Prompt;
   sound = true;
-  turnTimer = 45;
+  turnTimer: number = 0;
 
   constructor(
     public creatorId: string,
@@ -79,15 +79,18 @@ export class ChannelTable extends Table {
     
     let intervalId;
     if (this.turnTimer > 0) {
-      let remaining = this.turnTimer;
+      if (prompt.timerIntervalId) {
+        clearInterval(prompt.timerIntervalId);
+      }
+      newPrompt.remainingTime = prompt.remainingTime ?? this.turnTimer;
       const content = newMessage.content;
       const interval = 5;
-      intervalId = setInterval(() => {
-        remaining -= interval;
-        if (remaining > 30) return;
-        newMessage.edit(`${content}\n**${remaining}** seconds remaining.`);
-        if (remaining === 0) {
-          clearInterval(intervalId);
+      newPrompt.timerIntervalId = setInterval(() => {
+        newPrompt.remainingTime! -= interval;
+        if (newPrompt.remainingTime! > 30) return;
+        newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
+        if (newPrompt.remainingTime === 0) {
+          clearInterval(newPrompt.timerIntervalId!);
           newPrompt.resolve?.("fold");
         }
       }, interval * 1000);
@@ -197,9 +200,7 @@ export class ChannelTable extends Table {
   saveToDb() {
     const { pokerTables } = db;
     if (!pokerTables) throw new Error("Unable to save poker table. No database container.");
-    if (!tableCache[this.channel.id]) {
-      tableCache[this.channel.id] = this;
-    }
+    tableCache[this.channel.id] = this;
     const doc = {
       id: this.channel.id,
       autoMoveDealer: this.autoMoveDealer,
@@ -245,6 +246,7 @@ export class ChannelTable extends Table {
       smallBlind: this.smallBlind,
       smallBlindPosition: this.smallBlindPosition,
       sound: this.sound,
+      turnTimer: this.turnTimer,
       winners: this.winners?.map(player => player.id)
     };
     return pokerTables.items.upsert(doc);

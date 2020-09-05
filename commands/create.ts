@@ -32,6 +32,11 @@ export const builder = {
     type: "boolean",
     default: true
   },
+  "turn-timer": {
+    description: "The number of seconds a player has on their turn before they auto-fold.",
+    type: "number",
+    default: 45
+  },
   "reset": {
     description: "Remove all players and reset the table.",
     type: "boolean"
@@ -50,6 +55,7 @@ export async function handler (argv) {
     bigBlind,
     smallBlind,
     sound,
+    turnTimer,
     reset,
     debug
   } = argv;
@@ -97,6 +103,7 @@ export async function handler (argv) {
     bigBlind
   );
   table.sound = sound;
+  table.turnTimer = turnTimer;
   table.debug = debug;
   // Do not auto move dealer. We want to manually move the dealer after a win.
   table.autoMoveDealer = false;
