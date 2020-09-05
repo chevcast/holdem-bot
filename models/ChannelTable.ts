@@ -26,7 +26,7 @@ const {
   RARE_SOUND_SKIP_FRACTION
 } = config;
 
-const tableCache: {[key: string]: Table} = {};
+const tableCache: {[key: string]: ChannelTable} = {};
 
 export class ChannelTable extends Table {
 
