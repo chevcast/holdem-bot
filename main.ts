@@ -26,8 +26,9 @@ const {
   discordClient.on("message", message => {
     const { content, author } = message;
     if (author.tag === DISCORD_BOT_TAG) return;
-    if (content.substr(0, COMMAND_PREFIX!.length) !== COMMAND_PREFIX) return;
-    parse(content.substr(COMMAND_PREFIX.length), { discord: { message } });
+    if (content.substr(0, COMMAND_PREFIX!.length) === COMMAND_PREFIX) {
+      parse(content.substr(COMMAND_PREFIX.length), { discord: { message } });
+    }
   });
 
   http.createServer((req, res) => {
