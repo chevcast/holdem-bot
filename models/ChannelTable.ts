@@ -17,7 +17,6 @@ import { Prompt } from "./Prompt";
 import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
-import { table } from "console";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -30,10 +29,11 @@ const tableCache: {[key: string]: ChannelTable} = {};
 
 export class ChannelTable extends Table {
 
-  voiceConnection?: VoiceConnection
-  voiceTimeout?: NodeJS.Timeout
-  prompt?: Prompt
-  sound = true
+  voiceConnection?: VoiceConnection;
+  voiceTimeout?: NodeJS.Timeout;
+  prompt?: Prompt;
+  sound = true;
+  turnTimer = 45;
 
   constructor(
     public creatorId: string,
@@ -56,7 +56,7 @@ export class ChannelTable extends Table {
     if (prompt.reactions) {
       prompt.reactions.forEach(reaction => newMessage.react(reaction));
     }
-    newPrompt.promise = new Promise<Collection<string, Message> | Collection<string, MessageReaction>>((resolve, reject) => {
+    newPrompt.promise = (new Promise<string|undefined>((resolve, reject) => {
       let discordPromise: Promise<Collection<string, Message> | Collection<string, MessageReaction>>;
       if (prompt.awaitMessages && prompt.awaitReactions) {
         discordPromise = Promise.race([
@@ -68,14 +68,37 @@ export class ChannelTable extends Table {
       } else if (prompt.awaitReactions) {
         discordPromise = newMessage.awaitReactions(prompt.awaitReactions.filter, prompt.awaitReactions.options);
       }
-      discordPromise!.then(resolve).catch(reject);
+      discordPromise!.then(collected => {
+        const response = collected.first()!;
+        if (!response) return;
+        return (<MessageReaction>response)?.emoji?.id ?? (<Message>response).content;
+      }).then(resolve).catch(reject);
       newPrompt.resolve = resolve;
       newPrompt.reject = reject;
-    });
-
-    if (prompt.promise) {
-      newPrompt.promise.then(prompt.resolve).catch(prompt.reject);
+    }));
+    
+    let intervalId;
+    if (this.turnTimer > 0) {
+      let remaining = this.turnTimer;
+      const content = newMessage.content;
+      const interval = 5;
+      intervalId = setInterval(() => {
+        remaining -= interval;
+        if (remaining > 30) return;
+        newMessage.edit(`${content}\n**${remaining}** seconds remaining.`);
+        if (remaining === 0) {
+          clearInterval(intervalId);
+          newPrompt.resolve?.("fold");
+        }
+      }, interval * 1000);
     }
+
+    newPrompt.promise!.then(response => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      prompt.resolve?.(response);
+    }).catch(prompt.reject);
 
     return this.prompt = newPrompt;
   }

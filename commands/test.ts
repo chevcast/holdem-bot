@@ -7,14 +7,17 @@ export const description = false;
 
 export async function handler ({ discord }) {
   const message = discord.message as Message;
-  const table = new ChannelTable(message.author.id, message.channel as TextChannel);
-  console.log(table);
-  table.sitDown("Player 1", 3000);
-  table.sitDown("Player 2", 2000);
-  await table.saveToDb();
+  const msg = await message.reply("Hi");
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  msg.edit("Edited!");
+  // const table = new ChannelTable(message.author.id, message.channel as TextChannel);
+  // console.log(table);
+  // table.sitDown("Player 1", 3000);
+  // table.sitDown("Player 2", 2000);
+  // await table.saveToDb();
 
-  const table2 = await ChannelTable.findByChannelId(message.channel.id);
-  console.log(table2);
+  // const table2 = await ChannelTable.findByChannelId(message.channel.id);
+  // console.log(table2);
 
   // // message.channel.send("Does this work?", { tts: true });
 

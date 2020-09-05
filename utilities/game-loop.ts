@@ -1,6 +1,7 @@
 import {
   Message,
   MessageReaction,
+  Collection,
 } from "discord.js";
 import Yargs from "yargs/yargs";
 import formatMoney from "./format-money";
@@ -18,14 +19,21 @@ export default async function (table: ChannelTable) {
   if (table.prompt) return table.createPrompt(table.prompt);
 
   (async function () {
+
     let lastAction;
+
     while (table.currentRound) {
+
       const player = table.currentActor!;
+
       try {
+
         const legalActions = player.legalActions();
+
         if (legalActions.includes("bet") || legalActions.includes("raise")) {
           legalActions.push("all-in");
         }
+
         const actionsTxt = legalActions.map((action, index) => {
           if (["bet", "raise"].includes(action)) {
             action += " <number>";
@@ -35,6 +43,7 @@ export default async function (table: ChannelTable) {
           }
           return ` \`${action}\``;
         }).join();
+
         // Ask user what they would like to do.
         const currentBetTxt = table.currentBet && table.currentBet > 0 ? `The current bet is \`${formatMoney(table.currentBet)}\`.` : "There is no bet yet.";
         const reactions: ActionEmoji[] = [];
@@ -47,6 +56,7 @@ export default async function (table: ChannelTable) {
         if (legalActions.includes("fold")) {
           reactions.push(ActionEmoji.FOLD);
         }
+
         const prompt = await table.createPrompt({
           userId: player.id,
           text: `<@${player.id}>,${lastAction ? ` ${lastAction}` : ""} ${currentBetTxt} What would you like to do?\n You can type: ${actionsTxt}. You can also use the emoji reacts below this message.`,
@@ -67,12 +77,14 @@ export default async function (table: ChannelTable) {
           }
         });
 
-        const collected = await prompt.promise!;
+        const response = await prompt.promise!;
 
-        const response = collected.first()!;
-        let action: string;
         if (!response) continue;
-        switch ((<MessageReaction>response)?.emoji?.id) {
+
+        let action;
+
+        switch (response) {
+
           case ActionEmoji.CHECK_OR_CALL:
             if (legalActions.includes("check")) {
               action = "check";
@@ -80,6 +92,7 @@ export default async function (table: ChannelTable) {
               action = "call";
             }
             break;
+
           case ActionEmoji.BET_OR_RAISE:
             const prompt = await table.createPrompt({
               userId: player.id,
@@ -95,18 +108,14 @@ export default async function (table: ChannelTable) {
                 options: { max: 1 }
               }
             });
-
-            const collected = await prompt.promise!;
-
-            const betResponse = collected.first()!;
-            if (!betResponse) continue;
-            switch ((<MessageReaction>betResponse).emoji?.id) {
+            const response = await prompt.promise!;
+            switch (response) {
               case ActionEmoji.ALL_IN:
                 action = legalActions.includes("raise") ? `raise ${player.stackSize}` : `bet ${player.stackSize}`;
                 break;
-              case undefined:
-                const amount = (<Message>betResponse).content.toLowerCase().replace("$", "");
-                if (!amount) return;
+              default:
+                const amount = response?.toLowerCase().replace("$", "");
+                if (!amount) continue;
                 if (amount === "all-in") {
                   action = legalActions.includes("raise") ? `raise ${player.stackSize}` : `bet ${player.stackSize}`;
                 } else {
@@ -115,15 +124,18 @@ export default async function (table: ChannelTable) {
                 break;
             }
             break;
+
           case ActionEmoji.FOLD:
             action = "fold";
             break;
-          case undefined:
-            action = (<Message>response).content.toLowerCase();
-            if (action === "all-in") action = `raise ${player.stackSize}`;
-            break;
+
           default:
-            throw new Error(`<@${player.id}>, unrecognized action.`);
+            action = response?.toLowerCase();
+            if (action === "all-in") {
+              action = `raise ${player.stackSize}`;
+            }
+            break;
+
         }
 
         const roundBeforeAction = table.currentRound;

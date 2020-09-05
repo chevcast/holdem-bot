@@ -28,7 +28,7 @@ export interface Prompt {
     filter: CollectorFilter,
     options: AwaitMessagesOptions
   },
-  promise?: Promise<Collection<string, Message> | Collection<string, MessageReaction>>,
-  resolve?: (value?: Collection<string, Message> | Collection<string, MessageReaction>) => void,
+  promise?: Promise<string | undefined>,
+  resolve?: (value?: string | PromiseLike<string | undefined> | undefined) => void,
   reject?: (reason?: any) => void
 }
