@@ -80,7 +80,7 @@ export class ChannelTable extends Table {
     return this.prompt = newPrompt;
   }
 
-  async playRandomSound (directory: string) {
+  async playRandomSound (directory: string, volume?: number) {
     if (!this.sound) return;
     if (this.voiceTimeout) {
       clearTimeout(this.voiceTimeout);
@@ -111,7 +111,7 @@ export class ChannelTable extends Table {
         }
       } catch (err) {}
     }
-    return new Promise((resolve, reject) => this.voiceConnection!.play(soundPath).on("finish", resolve).on("error", reject));
+    return new Promise((resolve, reject) => this.voiceConnection!.play(soundPath, { volume }).on("finish", resolve).on("error", reject));
   }
 
   async render () {
