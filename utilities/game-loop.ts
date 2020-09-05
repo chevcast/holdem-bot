@@ -222,7 +222,7 @@ export default async function (table: ChannelTable) {
                 await table.playRandomSound("./sounds/place-card");
                 break;
               default:
-                await table.playRandomSound("./sounds/winner", 0.5);
+                await table.playRandomSound("./sounds/winner");
                 break;
             }
           })();

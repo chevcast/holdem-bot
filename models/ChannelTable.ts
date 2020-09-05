@@ -106,7 +106,7 @@ export class ChannelTable extends Table {
     return this.prompt = newPrompt;
   }
 
-  async playRandomSound (directory: string, volume?: number) {
+  async playRandomSound (directory: string, volume: number = 1) {
     if (!this.sound) return;
     if (this.voiceTimeout) {
       clearTimeout(this.voiceTimeout);
