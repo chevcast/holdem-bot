@@ -223,9 +223,9 @@ export default async function (table: ChannelTable) {
           table.cleanUp();
           // Manually move dealer after a win so we can tell who the next dealer is and allow them to issue the deal command.
           table.moveDealer(table.dealerPosition! + 1)
-          const dealer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
-          const channel = dealer.dmChannel || await dealer.createDM();
-          channel.send(`<@${dealer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
+          const dealerPlayer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
+          const channel = dealerPlayer.dmChannel || await dealerPlayer.createDM();
+          channel.send(`<@${dealerPlayer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
         }
         await table.saveToDb();
 
@@ -233,7 +233,7 @@ export default async function (table: ChannelTable) {
         await table.render();
         const user = table.channel.guild.members.cache.get(player.id)!.user;
         const channel = user.dmChannel || await user.createDM();
-        channel.send(`<@${player.id}>, ${err.message || err}`);
+        channel.send(`<@${player.id}>, ${err.stack || err.message || err}`);
       }
     }
   })();
