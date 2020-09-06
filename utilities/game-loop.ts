@@ -139,6 +139,7 @@ export default async function (table: ChannelTable) {
         }
 
         const roundBeforeAction = table.currentRound;
+        const currentBetBeforeAction = table.currentBet;
         const playerName = table.channel.guild!.members.cache.get(player.id)!.displayName;
 
         await new Promise((resolve, reject) => Yargs()
@@ -207,7 +208,9 @@ export default async function (table: ChannelTable) {
         if (table.voiceConnection && roundAfterAction !== roundBeforeAction) {
           await new Promise((resolve) => setTimeout(resolve, 500));
           (async () => {
-            await table.playRandomSound("./sounds/gather-chips");
+            if (currentBetBeforeAction) {
+              await table.playRandomSound("./sounds/gather-chips");
+            }
             await new Promise((resolve) => setTimeout(resolve, 500));
             switch (roundAfterAction) {
               case BettingRound.FLOP:
