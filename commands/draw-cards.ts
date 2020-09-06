@@ -6,24 +6,6 @@ export const command = "draw-cards";
 
 export const description = false;
 
-// const drawCard = (x: number, y: number, card: Card, ctx: CanvasRenderingContext2D) => {
-//   const cornerRadius = 10;
-//   roundRect(x, y, cardWidth, cardHeight, cornerRadius, ctx);
-//   ctx.fillStyle = "#ffffff";
-//   ctx.fill();
-//   ctx.strokeStyle = "#000000";
-//   ctx.lineWidth = 1;
-//   ctx.stroke();
-//   ctx.textAlign = "center";
-//   ctx.textBaseline = "middle";
-//   ctx.font = "bold 17px Arial";
-//   ctx.fillStyle = card.color;
-//   ctx.fillText(card.rank === CardRank.TEN ? "10" : card.rank, x + (cardWidth/2), y + (cardHeight/4));
-//   ctx.font = "bold 22px Arial";
-//   ctx.fillStyle = card.color;
-//   ctx.fillText(card.suitChar, x + (cardWidth/2), y + (cardHeight - (cardHeight/4)));
-// };
-
 export async function handler ({ discord }) {
   const message = discord.message as Message;
   const canvas = createCanvas(32, 32);
