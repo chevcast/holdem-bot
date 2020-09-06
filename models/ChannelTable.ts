@@ -91,7 +91,7 @@ export class ChannelTable extends Table {
         if (newPrompt.remainingTime === 0) {
           clearInterval(newPrompt.timerIntervalId!);
           if (this.currentActor?.legalActions().includes("check")) {
-            newPrompt.resolve?.("fold");
+            newPrompt.resolve?.("check");
           } else {
             newPrompt.resolve?.("fold");
           }
