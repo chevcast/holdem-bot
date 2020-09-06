@@ -114,7 +114,7 @@ export default async function (table: ChannelTable) {
                 action = legalActions.includes("raise") ? `raise ${player.stackSize}` : `bet ${player.stackSize}`;
                 break;
               default:
-                const amount = response?.toLowerCase().replace("$", "");
+                const amount = betResponse?.toLowerCase().replace("$", "");
                 if (!amount) continue;
                 if (amount === "all-in") {
                   action = legalActions.includes("raise") ? `raise ${player.stackSize}` : `bet ${player.stackSize}`;
