@@ -154,7 +154,7 @@ export class ChannelTable extends Table {
         "pokerTable.png"
       );
       const gameEmbed = new MessageEmbed()
-        .setTitle(`Hold'em Table\n#${this.channel.name}`)
+        .setTitle(`Hold'em Table\n${this.channel.guild.name}\n#${this.channel.name}`)
         .setDescription(`
           **Buy-in:** ${formatMoney(this.buyIn)}
           **Players:** ${this.players.filter(player => player !== null).length}
