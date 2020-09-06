@@ -77,7 +77,6 @@ export class ChannelTable extends Table {
       newPrompt.reject = reject;
     }));
     
-    let intervalId;
     if (this.turnTimer > 0) {
       if (prompt.timerIntervalId) {
         clearInterval(prompt.timerIntervalId);
@@ -91,7 +90,11 @@ export class ChannelTable extends Table {
         newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
         if (newPrompt.remainingTime === 0) {
           clearInterval(newPrompt.timerIntervalId!);
-          newPrompt.resolve?.("fold");
+          if (this.currentActor?.legalActions().includes("check")) {
+            newPrompt.resolve?.("fold");
+          } else {
+            newPrompt.resolve?.("fold");
+          }
         }
       }, interval * 1000);
     }
