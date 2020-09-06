@@ -87,7 +87,11 @@ export class ChannelTable extends Table {
       newPrompt.timerIntervalId = setInterval(() => {
         newPrompt.remainingTime! -= interval;
         if (newPrompt.remainingTime! > 30) return;
-        newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
+        if (newPrompt.remainingTime === 0) {
+          newMessage.edit(`${content}`);
+        } else {
+          newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
+        }
         if (newPrompt.remainingTime === 0) {
           clearInterval(newPrompt.timerIntervalId!);
           if (this.currentActor?.legalActions().includes("check")) {
