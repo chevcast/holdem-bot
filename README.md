@@ -29,8 +29,6 @@ Options:
 
 The table creator or the player in the dealer position can run this command.
 
-Once a hand has begun all seated players will receive a private message from Hold'em Bot. This message is where the entire hand and betting will take place. This way you can see your hole cards and don't have to flip back and forth between the private message and the channel <:awesome:708028362488021092>
-
 ---------------
 
 **`$hands`** - _(DM or Channel)_ - Show poker hand rankings guide.
