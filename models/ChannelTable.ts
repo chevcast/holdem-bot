@@ -162,9 +162,9 @@ export class ChannelTable extends Table {
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
         .setColor(0x00ff00)
-        .setImage("attachment://pokerTable.png")
         .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
         .attachFiles([pokerTable, "./images/chevtek.png"])
+        .setImage("attachment://pokerTable.png")
         .setFooter("Created by Chevtek", "attachment://chevtek.png");
       const sidePots = this.sidePots;
       if (sidePots) {

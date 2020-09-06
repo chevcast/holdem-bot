@@ -33,6 +33,10 @@ Once a hand has begun all seated players will receive a private message from Hol
 
 ---------------
 
+**`$hands`** - _(DM or Channel)_ - Show poker hand rankings guide.
+
+---------------
+
 **`$sit [seat] [buy-in]`** - _(Channel Only)_ - Take a seat at the active Hold'em table.
 
 Options:
