@@ -108,8 +108,8 @@ export default async function (table: ChannelTable) {
                 options: { max: 1 }
               }
             });
-            const response = await prompt.promise!;
-            switch (response) {
+            const betResponse = await prompt.promise!;
+            switch (betResponse) {
               case ActionEmoji.ALL_IN:
                 action = legalActions.includes("raise") ? `raise ${player.stackSize}` : `bet ${player.stackSize}`;
                 break;

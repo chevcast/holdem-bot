@@ -27,7 +27,7 @@ const {
     const { content, author } = message;
     if (author.id === discordClient.user!.id) return;
     if (content.substr(0, COMMAND_PREFIX!.length) === COMMAND_PREFIX) {
-      parse(content.substr(COMMAND_PREFIX.length), { discord: { message } });
+      parse(content.substr(COMMAND_PREFIX.length).toLowerCase(), { discord: { message } });
       return;
     }
     chatRelay(message);

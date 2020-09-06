@@ -97,8 +97,8 @@ export class ChannelTable extends Table {
     }
 
     newPrompt.promise!.then(response => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (newPrompt.timerIntervalId) {
+        clearInterval(newPrompt.timerIntervalId);
       }
       prompt.resolve?.(response);
     }).catch(prompt.reject);
