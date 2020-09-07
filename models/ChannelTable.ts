@@ -309,7 +309,13 @@ export class ChannelTable extends Table {
     }
     const { resource: doc } = await pokerTables.item(channelId).read();
     if (!doc) return;
-    const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
+    const channel = discordClient.channels.cache.get(doc.id) as TextChannel;
+    if (!channel) {
+      if (tableCache[doc.id]) {
+        delete tableCache[doc.id];
+      }
+      return pokerTables.item(doc.id).delete();
+    }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
@@ -336,6 +342,12 @@ export class ChannelTable extends Table {
     if (!resources || resources.length === 0) return;
     const [{ c: doc }] = resources;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
+    if (!channel) {
+      if (tableCache[doc.id]) {
+        delete tableCache[doc.id];
+      }
+      return pokerTables.item(doc.id).delete();
+    }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
