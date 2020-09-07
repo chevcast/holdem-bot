@@ -18,7 +18,7 @@ export async function handler ({ discord }) {
     .setColor(0x00ff00)
     .setTitle(`Hold'em Bot v${packageFile.version}`)
     .setURL(packageFile.homepage)
-    .setDescription(readmeFile)
+    .setDescription(readmeFile.split("\n").map(line => line.trimEnd()).join("\n"))
     .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
     .attachFiles(["./images/chevtek.png"])
     .setFooter("Created by Chevtek", "attachment://chevtek.png");

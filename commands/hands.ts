@@ -2,7 +2,7 @@ import { Message, MessageEmbed } from "discord.js";
 import discordClient from "../discord-client";
 import { SuitEmoji, RankEmoji } from "../models";
 
-export const command = "hands";
+export const command = ["hands", "rankings", "ranks"];
 
 export const description = "Show poker hand rankings.";
 
