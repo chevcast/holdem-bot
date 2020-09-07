@@ -314,7 +314,8 @@ export class ChannelTable extends Table {
       if (tableCache[doc.id]) {
         delete tableCache[doc.id];
       }
-      return pokerTables.item(doc.id).delete();
+      await pokerTables.item(doc.id).delete();
+      return;
     }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
@@ -346,7 +347,8 @@ export class ChannelTable extends Table {
       if (tableCache[doc.id]) {
         delete tableCache[doc.id];
       }
-      return pokerTables.item(doc.id).delete();
+      await pokerTables.item(doc.id).delete();
+      return;
     }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
