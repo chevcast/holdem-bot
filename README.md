@@ -1,6 +1,8 @@
 Welcome to Hold'em Bot!
 
 Check out the commands below to begin!  
+If you'd like to find people to play with, check out the Hold'em Bot discord server: https://discord.gg/TGzd9T3
+
 If you have any issues please submit them [here](https://github.com/chevtek/holdem-bot/issues).
 
 ---------------
