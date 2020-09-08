@@ -1,8 +1,3 @@
-import {
-  Message,
-  MessageReaction,
-  Collection,
-} from "discord.js";
 import Yargs from "yargs/yargs";
 import formatMoney from "./format-money";
 import { BettingRound } from "@chevtek/poker-engine";
@@ -241,6 +236,7 @@ export default async function (table: ChannelTable) {
           const dealerPlayer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
           const channel = dealerPlayer.dmChannel || await dealerPlayer.createDM();
           channel.send(`<@${dealerPlayer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
+          table.beginAutoDestructSequence();
         }
         await table.saveToDb();
 

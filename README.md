@@ -22,16 +22,14 @@ Create a Hold'em table in the current channel.
 > Specify the amount you, as the creator, intend to bring to the table. Default is the table minimum buy-in.  
 > **`--turn-timer <number>`**  
 > The number of seconds a player has to act on their turn. Default is 45 seconds. Specify 0 to disable turn timers.  
+> **`--auto-destruct-timer <number>`**  
+> The number of minutes before an idle table self-destructs.  
 > **`--reset`**  
 > Create a new table and override any existing table.  
 
 **`$deal`**  
 _(DM or Channel)_  
 Deal the cards and begin the hand! The table creator or the player in the dealer position can run this command.
-
-**`$hands`**  
-_(DM or Channel)_  
-Show poker hand rankings guide.
 
 **`$sit [seat] [buy-in]`**  
 _(Channel Only)_  
@@ -41,14 +39,23 @@ Take a seat at the active Hold'em table.
 > **`--buy-in <number>`**  
 > Specify the amount of money to bring to the table. Defaults to the minimum buy-in for the table.
 
-**`$stand`**  
+**`$stand [user]`**  
 _(DM or Channel)_  
-Stand up from your current table.
+Stand up from your current table. If you are the table creator you can optionally specify a user to forcibly remove them.
+
+**`$hands`**  
+_(DM or Channel)_  
+Show poker hand rankings guide.
+
+**`$terms`**  
+_(DM or Channel)_  
+Display a glossary of poker terminology.
+
 
 **`$refresh`**  
 _(DM or Channel)_  
 Refresh the current table. Useful if the table has been scrolled out of view by chatter.
 
 **`$destroy`**  
-_(DM or Channel)_  
+_(Channel Only)_  
 Destroy the current table. This command can only be issued by the table creator.

@@ -29,11 +29,13 @@ const tableCache: {[key: string]: ChannelTable} = {};
 
 export class ChannelTable extends Table {
 
-  voiceConnection?: VoiceConnection;
-  voiceTimeout?: NodeJS.Timeout;
+  autoDestructTimer: number = 0;
+  autoDestructTimeout?: NodeJS.Timeout;
   prompt?: Prompt;
   sound = true;
   turnTimer: number = 0;
+  voiceConnection?: VoiceConnection;
+  voiceTimeout?: NodeJS.Timeout;
 
   constructor(
     public creatorId: string,
@@ -111,6 +113,34 @@ export class ChannelTable extends Table {
     }).catch(prompt.reject);
 
     return this.prompt = newPrompt;
+  }
+
+  beginAutoDestructSequence () {
+    if (this.autoDestructTimer) {
+      this.autoDestructTimeout = setTimeout(async () => {
+        try {
+          await this.channel.send(`The Hold'em table in this channel has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
+          if (this.debug) {
+            const user = this.channel.guild.members.cache.get(this.creatorId)?.user;
+            const channel = user?.dmChannel || await user?.createDM();
+            if (channel) {
+              await channel.send(`The Hold'em table in this channel has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
+            }
+          } else {
+            for (const player of this.players) {
+              if (player === null) continue;
+              const user = this.channel.guild.members.cache.get(player.id)?.user;
+              const channel = user?.dmChannel || await user?.createDM();
+              if (!channel) continue;
+              await channel.send(`The Hold'em table in this channel has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
+            }
+          }
+          await this.deleteFromDb();
+        } catch (err) {
+          console.log(err);
+        }
+      }, this.autoDestructTimer * 60 * 1000);
+    }
   }
 
   async playRandomSound (directory: string, volume: number = 1) {
@@ -309,7 +339,14 @@ export class ChannelTable extends Table {
     }
     const { resource: doc } = await pokerTables.item(channelId).read();
     if (!doc) return;
-    const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
+    const channel = discordClient.channels.cache.get(doc.id) as TextChannel;
+    if (!channel) {
+      if (tableCache[doc.id]) {
+        delete tableCache[doc.id];
+      }
+      await pokerTables.item(doc.id).delete();
+      return;
+    }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
@@ -336,6 +373,13 @@ export class ChannelTable extends Table {
     if (!resources || resources.length === 0) return;
     const [{ c: doc }] = resources;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
+    if (!channel) {
+      if (tableCache[doc.id]) {
+        delete tableCache[doc.id];
+      }
+      await pokerTables.item(doc.id).delete();
+      return;
+    }
     const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
