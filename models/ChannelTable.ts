@@ -284,7 +284,8 @@ export class ChannelTable extends Table {
       smallBlindPosition: this.smallBlindPosition,
       sound: this.sound,
       turnTimer: this.turnTimer,
-      winners: this.winners?.map(player => player.id)
+      winners: this.winners?.map(player => player.id),
+      _partitionKey: "/_partitionKey"
     };
     return pokerTables.items.upsert(doc);
   }

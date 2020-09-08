@@ -24,6 +24,7 @@ export async function initializeDb () {
     { id: "poker-tables" },
     { offerThroughput: 400 }
   );
+  container.getPartitionKeyDefinition().then(console.log);
   containers.pokerTables = container;
 }
 
