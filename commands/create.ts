@@ -37,6 +37,11 @@ export const builder = {
     type: "number",
     default: 45
   },
+  "auto-destruct-timer": {
+    description: "The number of minutes to wait before a table becomes idle and is automatically destroyed.",
+    type: "number",
+    default: 15
+  },
   "reset": {
     description: "Remove all players and reset the table.",
     type: "boolean"
@@ -56,6 +61,7 @@ export async function handler (argv) {
     smallBlind,
     sound,
     turnTimer,
+    autoDestructTimer,
     reset,
     debug
   } = argv;
@@ -104,6 +110,7 @@ export async function handler (argv) {
   );
   table.sound = sound;
   table.turnTimer = turnTimer;
+  table.autoDestructTimer = autoDestructTimer;
   table.debug = debug;
   // Do not auto move dealer. We want to manually move the dealer after a win.
   table.autoMoveDealer = false;
