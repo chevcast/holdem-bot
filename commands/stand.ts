@@ -25,12 +25,13 @@ export async function handler ({ discord, user }) {
       return;
     }
   }
+  let userId: string|undefined = message.author.id;
   if (user) {
     if (message.author.id !== table.creatorId) {
       await message.reply("Only the table creator can forcibly remove a player.");
       return;
     }
-    let userId = user.match(/^<@!?(.+)>$/)?.[1];
+    userId = user.match(/^<@!?(.+)>$/)?.[1];
     if (!userId) {
       userId = message.guild?.members.cache.find(member => member.displayName.toLowerCase() === user)?.id;
       if (!userId) {
@@ -38,32 +39,12 @@ export async function handler ({ discord, user }) {
         return;
       }
     }
-    await message.reply(`Are you sure you want to remove <@${userId}> from the table?`);
-    try {
-      const collected = await message.channel.awaitMessages(
-        response => {
-          if (response.author.id !== message.author.id) return false;
-          return ["yes", "y", "no", "n"].includes(response.content.toLowerCase());
-        },
-        { max: 1, time: 20000, errors: ["time"] }
-      );
-      if (!["yes", "y"].includes(collected.first()!.content.toLowerCase())) return;
-      if (table.currentActor?.id === message.author.id) {
-        table.prompt?.resolve?.();
-      }
-      table.standUp(userId);
-      await Promise.all([table.saveToDb(), table.render()]);
-      await message.reply(`You have removed <@${userId}> from your active Hold'em table.`);
-    } catch (err) {
-      if (!err.message) {
-        await message.reply("No confirmation received. You are still playing!");
-      } else {
-        await message.reply(err.message);
-      }
-    }
-    return;
   }
-  await message.reply("Are you sure you want to leave the game? (y/n)")
+  if (userId !== message.author.id) {
+    await message.reply(`Are you sure you want to remove <@${userId}> from the table? (y/n)`);
+  } else {
+    await message.reply("Are you sure you want to leave the game? (y/n)")
+  }
   try {
     const collected = await message.channel.awaitMessages(
       response => {
@@ -77,8 +58,24 @@ export async function handler ({ discord, user }) {
       table.prompt?.resolve?.();
     }
     table.standUp(message.author.id);
-    await Promise.all([table.saveToDb(), table.render()]);
-    await message.reply("You have left your active Hold'em table.");
+    await table.render();
+    if (message.author.id !== userId) {
+      await message.reply(`<@${userId}> has been removed from the table.`);
+    } else {
+      await message.reply("You have left your active Hold'em table.");
+    }
+    const players = table.players.filter(player => player !== null);
+    if (players.length > 0) {
+      if (table.creatorId === userId) {
+        const [newOwner] = players;
+        table.creatorId = newOwner!.id;
+        await message.channel.send(`<@${table.creatorId}>, you are now the table owner.`);
+      }
+      await table.saveToDb();
+    } else {
+      await table.deleteFromDb();
+      await message.reply("No more players at the table. The table has been destroyed.");
+    }
   } catch (err) {
     if (!err.message) {
       await message.reply("No confirmation received. You are still playing!");

@@ -41,9 +41,9 @@ Take a seat at the active Hold'em table.
 > **`--buy-in <number>`**  
 > Specify the amount of money to bring to the table. Defaults to the minimum buy-in for the table.
 
-**`$stand`**  
+**`$stand [user]`**  
 _(DM or Channel)_  
-Stand up from your current table.
+Stand up from your current table. If you are the table creator you can optionally specify a user to forcibly remove them.
 
 **`$refresh`**  
 _(DM or Channel)_  
