@@ -11,6 +11,7 @@ import chatRelay from "./chat-relay";
 
 const {
   COMMAND_PREFIX,
+  DISCORD_BOT_TOKEN,
   PORT
 } = config;
 
@@ -21,8 +22,6 @@ const {
     console.log(`Holdem-bot online [${moment()}]`);
   });
 
-  await initializeDb();
-
   discordClient.on("message", message => {
     const { content, author } = message;
     if (author.id === discordClient.user!.id) return;
@@ -32,6 +31,9 @@ const {
     }
     chatRelay(message);
   });
+
+  await initializeDb();
+  await discordClient.login(DISCORD_BOT_TOKEN);
 
   http.createServer((req, res) => {
     res.writeHead(200);

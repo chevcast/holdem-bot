@@ -1,10 +1,3 @@
-import { Client as DiscordClient } from "discord.js";
-import config from "./config";
+import { Client } from "discord.js";
 
-const { DISCORD_BOT_TOKEN } = config;
-
-const client = new DiscordClient();
-
-client.login(DISCORD_BOT_TOKEN);
-
-export default client;
+export default new Client();
