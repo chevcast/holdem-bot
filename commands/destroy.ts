@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { ChannelTable } from "../models";
+import { PokerTable } from "../models";
 
 export const command = ["destroy", "finish", "end", "delete"];
 
@@ -11,7 +11,7 @@ export async function handler ({ discord }) {
     message.reply("This command can only be run from a channel on a server.");
     return;
   }
-  let table = await ChannelTable.findByChannelId(message.channel.id);
+  let table = await PokerTable.findByChannelId(message.channel.id);
   if (!table) {
     message.reply("There is no active Hold'em game in this channel.");
     return;

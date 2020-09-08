@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
 import { gameLoop } from "../utilities";
-import { ChannelTable } from "../models";
+import { PokerTable } from "../models";
 
 export const command = ["refresh", "resume", "r"];
 
@@ -8,9 +8,9 @@ export const description = "Resume the Hold'em game in this channel if it was pa
 
 export async function handler ({ discord }) {
   const message = discord.message as Message;
-  let table = await ChannelTable.findByChannelId(message.channel.id);
+  let table = await PokerTable.findByChannelId(message.channel.id);
   if (!table) {
-    table = await ChannelTable.findByPlayerId(message.author.id);
+    table = await PokerTable.findByPlayerId(message.author.id);
     if (!table) {
       if (message.channel.type === "dm") {
         message.reply("You do not have an active Hold'em table.");

@@ -25,9 +25,9 @@ const {
   RARE_SOUND_SKIP_FRACTION
 } = config;
 
-const tableCache: {[key: string]: ChannelTable} = {};
+const tableCache: {[key: string]: PokerTable} = {};
 
-export class ChannelTable extends Table {
+export class PokerTable extends Table {
 
   autoDestructTimer: number = 0;
   autoDestructTimeout?: NodeJS.Timeout;
@@ -348,7 +348,7 @@ export class ChannelTable extends Table {
       await pokerTables.item(doc.id).delete();
       return;
     }
-    const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new PokerTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
     }
@@ -381,7 +381,7 @@ export class ChannelTable extends Table {
       await pokerTables.item(doc.id).delete();
       return;
     }
-    const table = (new ChannelTable(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new PokerTable(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
     }

@@ -2,7 +2,7 @@ import { createCanvas, registerFont, loadImage } from "canvas";
 import { calcShapePoints, roundRect } from ".";
 import { formatMoney } from "../utilities";
 import { CardSuit, Card, BettingRound, CardRank } from "@chevtek/poker-engine";
-import { ChannelTable } from "../models";
+import { PokerTable } from "../models";
 import config from "../config";
 
 const { COMMAND_PREFIX } = config;
@@ -20,7 +20,7 @@ const suitChar = (suit: CardSuit) => {
   }
 };
 
-export default async function (table: ChannelTable): Promise<Buffer> {
+export default async function (table: PokerTable): Promise<Buffer> {
 
   registerFont("./fonts/arial.ttf", { family: "sans-serif" });
   registerFont("./fonts/arialbd.ttf", { family: "sans-serif" });
