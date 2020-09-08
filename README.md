@@ -22,6 +22,8 @@ Create a Hold'em table in the current channel.
 > Specify the amount you, as the creator, intend to bring to the table. Default is the table minimum buy-in.  
 > **`--turn-timer <number>`**  
 > The number of seconds a player has to act on their turn. Default is 45 seconds. Specify 0 to disable turn timers.  
+> **`--auto-destruct-timer <number>`**  
+> The number of minutes before an idle table self-destructs.  
 > **`--reset`**  
 > Create a new table and override any existing table.  
 
