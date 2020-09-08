@@ -31,10 +31,6 @@ Create a Hold'em table in the current channel.
 _(DM or Channel)_  
 Deal the cards and begin the hand! The table creator or the player in the dealer position can run this command.
 
-**`$hands`**  
-_(DM or Channel)_  
-Show poker hand rankings guide.
-
 **`$sit [seat] [buy-in]`**  
 _(Channel Only)_  
 Take a seat at the active Hold'em table.
@@ -47,10 +43,19 @@ Take a seat at the active Hold'em table.
 _(DM or Channel)_  
 Stand up from your current table. If you are the table creator you can optionally specify a user to forcibly remove them.
 
+**`$hands`**  
+_(DM or Channel)_  
+Show poker hand rankings guide.
+
+**`$terms`**  
+_(DM or Channel)_  
+Display a glossary of poker terminology.
+
+
 **`$refresh`**  
 _(DM or Channel)_  
 Refresh the current table. Useful if the table has been scrolled out of view by chatter.
 
 **`$destroy`**  
-_(DM or Channel)_  
+_(Channel Only)_  
 Destroy the current table. This command can only be issued by the table creator.
