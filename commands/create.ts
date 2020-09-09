@@ -128,13 +128,22 @@ export async function handler (argv) {
   table.debug = debug;
   // Do not auto move dealer. We want to manually move the dealer after a win.
   table.autoMoveDealer = false;
-  table.sitDown(message.author.id, buyIn || table.buyIn);
+  const stack = buyIn || minBuyIn;
+  table.sitDown(message.author.id, stack);
   const account = (await Account.findByPlayerAndGuild(message.author.id, message.guild!.id))
     ?? new Account(
       message.author.id,
       message.guild!.id,
       parseInt(DEFAULT_BANKROLL)
     );
-  account.bankroll -= buyIn || minBuyIn;
+  if (account.bankroll < stack) {
+    if (stack <= parseInt(DEFAULT_BANKROLL)) {
+      account.bankroll = parseInt(DEFAULT_BANKROLL);
+    } else {
+      await message.reply("You do not have enough money to buy into this game.");
+      return;
+    }
+  }
+  account.bankroll -= stack;
   await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
 }
