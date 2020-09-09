@@ -13,19 +13,24 @@ const client = new CosmosClient({
 });
 
 interface containers {
-  pokerTables?: Container
+  tables?: Container,
+  players?: Container
 }
 
 let containers: containers = {};
 
-export async function initializeDb () {
+export async function initializeDb() {
   const { database } = await client.databases.createIfNotExists({ id: COSMOS_DATABASE_ID });
-  const { container } = await database.containers.createIfNotExists(
-    { id: "poker-tables" },
+  const { container: tables } = await database.containers.createIfNotExists(
+    { id: "tables" },
     { offerThroughput: 400 }
   );
-  container.getPartitionKeyDefinition().then(console.log);
-  containers.pokerTables = container;
+  containers.tables = tables;
+  const { container: players } = await database.containers.createIfNotExists(
+    { id: "players" },
+    { offerThroughput: 400 }
+  );
+  containers.players = players;
 }
 
 export default containers;

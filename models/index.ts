@@ -1,3 +1,4 @@
 export * from "./CardEmoji";
-export * from "./PokerTable";
+export * from "./Table";
+export * from "./Player";
 export * from "./Prompt";

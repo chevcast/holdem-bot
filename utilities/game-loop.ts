@@ -1,12 +1,12 @@
 import Yargs from "yargs/yargs";
 import formatMoney from "./format-money";
 import { BettingRound } from "@chevtek/poker-engine";
-import { PokerTable, ActionEmoji } from "../models";
+import { Table, ActionEmoji } from "../models";
 import config from "../config";
 
 const { COMMAND_PREFIX } = config;
 
-export default async function (table: PokerTable) {
+export default async function (table: Table) {
 
   await table.render();
 

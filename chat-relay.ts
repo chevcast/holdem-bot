@@ -1,10 +1,10 @@
 import { Message } from "discord.js";
-import { PokerTable } from "./models";
+import { Table } from "./models";
 
 export default async function (message: Message) {
   if (message.channel.type === "dm") {
     // Post in other DMs and channel.
-    const table = await PokerTable.findByPlayerId(message.author.id);
+    const table = await Table.findByPlayerId(message.author.id);
     if (!table) return;
     if (table?.prompt?.userId === message.author.id) {
       return;
@@ -22,7 +22,7 @@ export default async function (message: Message) {
     }
   } else {
     // Post to all DMs.
-    const table = await PokerTable.findByChannelId(message.channel.id);
+    const table = await Table.findByChannelId(message.channel.id);
     if (!table) return;
     if (table.debug) {
       const user = table.channel.guild.members.cache.get(table.creatorId)!.user;

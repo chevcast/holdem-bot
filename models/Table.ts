@@ -10,7 +10,7 @@ import {
   Collection,
   MessageReaction,
 } from "discord.js";
-import { Table, Card, Player, Pot } from "@chevtek/poker-engine";
+import { Table as TableBase, Card, Player, Pot } from "@chevtek/poker-engine";
 import { renderPokerTable } from "../drawing-utils";
 import { formatMoney } from "../utilities";
 import { Prompt } from "./Prompt";
@@ -25,9 +25,9 @@ const {
   RARE_SOUND_SKIP_FRACTION
 } = config;
 
-const tableCache: {[key: string]: PokerTable} = {};
+const tableCache: { [key: string]: Table } = {};
 
-export class PokerTable extends Table {
+export class Table extends TableBase {
 
   autoDestructTimer: number = 0;
   autoDestructTimeout?: NodeJS.Timeout;
@@ -53,12 +53,12 @@ export class PokerTable extends Table {
     }
     const user = this.channel.guild!.members.cache.get(prompt.userId)!.user;
     const channel = user!.dmChannel || await user!.createDM();
-    const newPrompt: Prompt = {...prompt};
+    const newPrompt: Prompt = { ...prompt };
     const newMessage = await channel.send(prompt.text);
     if (prompt.reactions) {
       prompt.reactions.forEach(reaction => newMessage.react(reaction));
     }
-    newPrompt.promise = (new Promise<string|undefined>((resolve, reject) => {
+    newPrompt.promise = (new Promise<string | undefined>((resolve, reject) => {
       let discordPromise: Promise<Collection<string, Message> | Collection<string, MessageReaction>>;
       if (prompt.awaitMessages && prompt.awaitReactions) {
         discordPromise = Promise.race([
@@ -78,7 +78,7 @@ export class PokerTable extends Table {
       newPrompt.resolve = resolve;
       newPrompt.reject = reject;
     }));
-    
+
     if (this.turnTimer > 0) {
       if (prompt.timerIntervalId) {
         clearInterval(prompt.timerIntervalId);
@@ -115,7 +115,7 @@ export class PokerTable extends Table {
     return this.prompt = newPrompt;
   }
 
-  beginAutoDestructSequence () {
+  beginAutoDestructSequence() {
     if (this.autoDestructTimer) {
       this.autoDestructTimeout = setTimeout(async () => {
         try {
@@ -143,7 +143,7 @@ export class PokerTable extends Table {
     }
   }
 
-  async playRandomSound (directory: string, volume: number = 1) {
+  async playRandomSound(directory: string, volume: number = 1) {
     if (!this.sound) return;
     if (this.voiceTimeout) {
       clearTimeout(this.voiceTimeout);
@@ -172,12 +172,12 @@ export class PokerTable extends Table {
         if (rareFiles.length > 0) {
           soundPath = path.join(directory, "rare", rareFiles[Math.floor(Math.random() * rareFiles.length)]);
         }
-      } catch (err) {}
+      } catch (err) { }
     }
     return new Promise((resolve, reject) => this.voiceConnection!.play(soundPath, { volume }).on("finish", resolve).on("error", reject));
   }
 
-  async render () {
+  async render() {
     const generateGameEmbed = async () => {
       const pokerTable = new MessageAttachment(
         await renderPokerTable(this),
@@ -235,8 +235,8 @@ export class PokerTable extends Table {
   }
 
   saveToDb() {
-    const { pokerTables } = db;
-    if (!pokerTables) throw new Error("Unable to save poker table. No database container.");
+    const { tables } = db;
+    if (!tables) throw new Error("Unable to save poker table. No database container.");
     tableCache[this.channel.id] = this;
     const doc = {
       id: this.channel.id,
@@ -287,16 +287,16 @@ export class PokerTable extends Table {
       winners: this.winners?.map(player => player.id),
       _partitionKey: "/_partitionKey"
     };
-    return pokerTables.items.upsert(doc);
+    return tables.items.upsert(doc);
   }
 
-  deleteFromDb () {
-    const { pokerTables } = db;
-    if (!pokerTables) throw new Error("Unable to delete table. No container found.");
+  deleteFromDb() {
+    const { tables } = db;
+    if (!tables) throw new Error("Unable to delete table. No container found.");
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
     }
-    return pokerTables.item(this.channel.id).delete();
+    return tables.item(this.channel.id).delete();
   }
 
   populateFromDoc(doc: any) {
@@ -333,22 +333,22 @@ export class PokerTable extends Table {
   }
 
   static async findByChannelId(channelId: string) {
-    const { pokerTables } = db;
-    if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
+    const { tables } = db;
+    if (!tables) throw new Error("Unable to find table. No poker table container.");
     if (tableCache[channelId]) {
       return tableCache[channelId];
     }
-    const { resource: doc } = await pokerTables.item(channelId).read();
+    const { resource: doc } = await tables.item(channelId).read();
     if (!doc) return;
     const channel = discordClient.channels.cache.get(doc.id) as TextChannel;
     if (!channel) {
       if (tableCache[doc.id]) {
         delete tableCache[doc.id];
       }
-      await pokerTables.item(doc.id).delete();
+      await tables.item(doc.id).delete();
       return;
     }
-    const table = (new PokerTable(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
     }
@@ -356,8 +356,8 @@ export class PokerTable extends Table {
   }
 
   static async findByPlayerId(playerId: string) {
-    const { pokerTables } = db;
-    if (!pokerTables) throw new Error("Unable to find table. No poker table container.");
+    const { tables } = db;
+    if (!tables) throw new Error("Unable to find table. No poker table container.");
     for (const channelId in tableCache) {
       const table = tableCache[channelId];
       const playerMatches = table.players.filter(player => player && player.id === playerId);
@@ -365,7 +365,7 @@ export class PokerTable extends Table {
         return table;
       }
     }
-    const { resources } = await pokerTables.items.query({
+    const { resources } = await tables.items.query({
       query: "SELECT DISTINCT c FROM c JOIN pc IN c.players WHERE pc.id IN (@playerId)",
       parameters: [
         { name: "@playerId", value: playerId }
@@ -378,10 +378,10 @@ export class PokerTable extends Table {
       if (tableCache[doc.id]) {
         delete tableCache[doc.id];
       }
-      await pokerTables.item(doc.id).delete();
+      await tables.item(doc.id).delete();
       return;
     }
-    const table = (new PokerTable(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
     }

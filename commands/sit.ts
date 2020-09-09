@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { PokerTable } from "../models";
+import { Table } from "../models";
 import config from "../config";
 
 const { COMMAND_PREFIX } = config;
@@ -24,12 +24,12 @@ export async function handler ({ discord, buyIn, seat }) {
     message.reply("This command can only be run from a channel on a server.");
     return;
   }
-  const table = await PokerTable.findByChannelId(message.channel.id);
+  const table = await Table.findByChannelId(message.channel.id);
   if (!table) {
     message.reply("There is no active Hold'em game in this channel.");
     return;
   }
-  const existingTable = await PokerTable.findByPlayerId(message.author.id);
+  const existingTable = await Table.findByPlayerId(message.author.id);
   if (existingTable && table.channel.id !== existingTable.channel.id) {
     message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
     return;
