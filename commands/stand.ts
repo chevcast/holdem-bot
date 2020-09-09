@@ -63,9 +63,15 @@ export async function handler ({ discord, user }) {
     playersThatStood.forEach(({ stackSize }) => account.bankroll += stackSize);
     await Promise.all([account.saveToDb(), table.render()]);
     if (message.author.id !== userId) {
-      await message.reply(`<@${userId}> has been removed from the table.`);
+      await Promise.all([
+        message.reply(`<@${userId}> has been removed from the table.`),
+        table.channel.send(`<@${userId}> has been removed from the table.`)
+      ]);
     } else {
-      await message.reply("You have left your active Hold'em table.");
+      await Promise.all([
+        message.reply("You have left your active Hold'em table."),
+        table.channel.send(`<@${userId}> has left the table.`)
+      ]);
     }
     const players = table.players.filter(player => player !== null);
     if (players.length > 0) {
