@@ -5,7 +5,7 @@ import { formatMoney } from "../utilities";
 
 const { DEFAULT_BANKROLL } = config;
 
-export const command = ["bankroll [user]", "bank", "me", "account"];
+export const command = ["bankroll [user]", "bankrolls", "bank", "me", "account", "accounts"];
 
 export const definition = "Show a user's bankroll.";
 
@@ -18,10 +18,25 @@ export const builder = yargs => yargs
 export async function handler ({ discord, user: mention }) {
   const message = discord.message as Message;
   const userId = mention?.match(/^<@!?(\d+)>$/)?.[1] ?? message.author.id;
-  const user = message.client.users.cache.get(userId)!;
-  const accounts = await Account.findByPlayerId(userId);
+  const user = message.client.users.cache.get(userId);
+  if (!user) {
+    await message.reply("Invalid user specified.");
+    return;
+  }
+  let accounts = await Account.findByPlayerId(userId);
+  if (message.author.id === userId
+    && message.guild
+    && (!accounts 
+      || accounts.filter(account =>
+        account.guildId === message.guild!.id).length === 0))
+  {
+    const account = new Account(userId, message.guild.id, parseInt(DEFAULT_BANKROLL));
+    await account.saveToDb();
+    if (!accounts) accounts = [];
+    accounts.push(account);
+  }
   if (!accounts || accounts.length === 0) {
-    await message.reply("You do not have any bankrolls on any Discord servers.");
+    await message.reply(`${user.username} does not yet have any bankrolls.`);
     return;
   }
   const accountsEmbed = new MessageEmbed()
