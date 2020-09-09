@@ -303,6 +303,9 @@ export class Table extends TableBase {
   deleteFromDb() {
     const { tables } = db;
     if (!tables) throw new Error("Unable to delete table. No container found.");
+    if (this.autoDestructTimer) {
+      clearTimeout(this.autoDestructTimer);
+    }
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
     }
