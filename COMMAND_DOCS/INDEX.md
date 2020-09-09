@@ -8,6 +8,8 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 ---------------
 
+**`$bankroll`** _(DM or Channel)_ - Show a user's bankrolls.
+
 **`$create`** _(Channel Only)_ - Create a Hold'em table in the current channel.
 
 **`$deal`** _(DM or Channel)_ - Deal the cards and begin the hand! The table creator or the player in the dealer position can run this command.
