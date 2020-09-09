@@ -72,12 +72,20 @@ export async function handler ({ discord, user }) {
       if (table.creatorId === userId) {
         const [newOwner] = players;
         table.creatorId = newOwner!.id;
-        await message.channel.send(`<@${table.creatorId}>, you are now the table owner.`);
+        const user = message.client.users.cache.get(table.creatorId);
+        const channel = user!.dmChannel || await user!.createDM();
+        await Promise.all([
+          channel.send(`<@${table.creatorId}>, you are now the table owner.`),
+          table.channel.send(`<@${table.creatorId}> is the new table owner.`)
+        ]);
       }
       await table.saveToDb();
     } else {
+      await Promise.all([
+        message.reply("No more players at the table. The table has been destroyed."),
+        table.channel.send("No more players at the table. The table has been destroyed.")
+      ]);
       await table.deleteFromDb();
-      await message.reply("No more players at the table. The table has been destroyed.");
     }
   } catch (err) {
     if (!err.message) {
