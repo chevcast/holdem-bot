@@ -116,6 +116,9 @@ export class Table extends TableBase {
   }
 
   beginAutoDestructSequence() {
+    if (this.autoDestructTimeout) {
+      clearTimeout(this.autoDestructTimeout);
+    }
     if (this.autoDestructTimer) {
       this.autoDestructTimeout = setTimeout(async () => {
         try {
@@ -303,8 +306,8 @@ export class Table extends TableBase {
   deleteFromDb() {
     const { tables } = db;
     if (!tables) throw new Error("Unable to delete table. No container found.");
-    if (this.autoDestructTimer) {
-      clearTimeout(this.autoDestructTimer);
+    if (this.autoDestructTimeout) {
+      clearTimeout(this.autoDestructTimeout);
     }
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
