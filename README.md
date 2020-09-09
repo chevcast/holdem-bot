@@ -9,9 +9,9 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 **`$bankroll [user]`**  
 _(Channel or DM)_  
-Show a user's bankroll.
+Show a user's bankrolls.
 > **`--user <@mention>`**  
-> @mention a user to show their bankroll. Defaults to yourself if no user is mentioned.
+> @mention a user to show their bankrolls. Defaults to yourself if no user is mentioned.
 
 **`$create`**  
 _(Channel Only)_  
