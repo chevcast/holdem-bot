@@ -13,9 +13,9 @@ export async function handler ({ discord }) {
     table = await Table.findByPlayerId(message.author.id);
     if (!table) {
       if (message.channel.type === "dm") {
-        message.reply("You do not have an active Hold'em table.");
+        await message.reply("You do not have an active Hold'em table.");
       } else {
-        message.reply("There is no active Hold'em game in this channel.");
+        await message.reply("There is no active Hold'em game in this channel.");
       }
       return;
     }

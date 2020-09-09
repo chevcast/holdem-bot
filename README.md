@@ -7,9 +7,15 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 ---------------
 
+**`$bankroll [user]`**  
+_(Channel or DM)_  
+Show a user's bankroll.
+> **`--user <@mention>`**  
+> @mention a user to show their bankroll. Defaults to yourself if no user is mentioned.
+
 **`$create`**  
 _(Channel Only)_  
-Create a Hold'em table in the current channel.
+Create a Hold'em table in the current channel.  
 > **`--min-buy-in <number>`**  
 > Specify a minimum buy-in amount for the table. Default is $1000.  
 > **`--no-sound`**  
@@ -33,7 +39,7 @@ Deal the cards and begin the hand! The table creator or the player in the dealer
 
 **`$sit [seat] [buy-in]`**  
 _(Channel Only)_  
-Take a seat at the active Hold'em table.
+Take a seat at the active Hold'em table.  
 > **`--seat <number>`**  
 > Specify which seat you'd like to take at the table.  
 > **`--buy-in <number>`**  
@@ -41,7 +47,9 @@ Take a seat at the active Hold'em table.
 
 **`$stand [user]`**  
 _(DM or Channel)_  
-Stand up from your current table. If you are the table creator you can optionally specify a user to forcibly remove them.
+Stand up from your current table. If you are the table owner you can optionally specify a user to forcibly remove them.  
+> **`--user <@mention>`**  
+> @mention a user to remove that user from the table. Only allowed if you're the table owner.
 
 **`$hands`**  
 _(DM or Channel)_  
@@ -50,7 +58,6 @@ Show poker hand rankings guide.
 **`$terms`**  
 _(DM or Channel)_  
 Display a glossary of poker terminology.
-
 
 **`$refresh`**  
 _(DM or Channel)_  

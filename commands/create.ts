@@ -2,6 +2,7 @@ import { Message, TextChannel } from "discord.js";
 import { gameLoop } from "../utilities";
 import { Table, Account } from "../models";
 import config from "../config";
+import { min } from "moment";
 
 const {
   COMMAND_PREFIX,
@@ -70,13 +71,13 @@ export async function handler (argv) {
   } = argv;
   const message = discord.message as Message;
   if (message.channel.type === "dm") {
-    message.reply("This command can only be run from a channel on a server.");
+    await message.reply("This command can only be run from a channel on a server.");
     return;
   }
   let table = await Table.findByChannelId(message.channel.id);
   if (table) {
     if (!reset) {
-      message.reply("There is already an active Hold'em game in this channel.");
+      await message.reply("There is already an active Hold'em game in this channel.");
       await table.render();
       if (table.currentRound) {
         gameLoop(table);
@@ -84,7 +85,7 @@ export async function handler (argv) {
       return;
     }
     try {
-      message.reply("Are you sure? Type `CONFIRM` to reset the table.");
+      await message.reply("Are you sure? Type `CONFIRM` to reset the table.");
       await message.channel.awaitMessages(
         response => {
           if (response.author.id !== message.author.id) return false;
@@ -92,26 +93,26 @@ export async function handler (argv) {
         },
         { max: 1, time: 20000, errors: ["time"] }
       );
-      await Promise.all(table.players.map(async player => {
-        if (!player) return;
-        const account = await Account.findByIdAndGuild(player.id, message.guild!.id);
+      for (const player of table.players) {
+        if (!player) continue;
+        const account = await Account.findByPlayerAndGuild(player.id, table!.channel.guild.id);
         if (!account) {
           await message.reply(`Unable to find player ${player.id} in DB. Unable to return stack.`);
           return;
         }
         account.bankroll += player.stackSize;
-        return account.saveToDb();
-      }));
+        await account.saveToDb();
+      };
       table.prompt?.resolve?.();
       await table.deleteFromDb();
     } catch (err) {
-      message.reply("No confirmation received. The table was not reset.");
+      await message.reply("No confirmation received. The table was not reset.");
       return;
     }
   }
   const existingTable = await Table.findByPlayerId(message.author.id);
   if (existingTable && (!table || table.channel.id !== existingTable.channel.id)) {
-    message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
+    await message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
     return;
   }
   table = new Table(
@@ -128,11 +129,12 @@ export async function handler (argv) {
   // Do not auto move dealer. We want to manually move the dealer after a win.
   table.autoMoveDealer = false;
   table.sitDown(message.author.id, buyIn || table.buyIn);
-  const creator = (await Account.findByIdAndGuild(message.author.id, message.guild!.id))
+  const account = (await Account.findByPlayerAndGuild(message.author.id, message.guild!.id))
     ?? new Account(
       message.author.id,
       message.guild!.id,
-      parseInt(DEFAULT_BANKROLL) - (buyIn || minBuyIn)
-    )
-  await Promise.all([table.saveToDb(), creator.saveToDb(), table.render()]);
+      parseInt(DEFAULT_BANKROLL)
+    );
+  account.bankroll -= buyIn || minBuyIn;
+  await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
 }

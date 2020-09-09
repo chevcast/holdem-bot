@@ -50,7 +50,7 @@ export default (cmdInput, context) => {
           const cmdName = argv._[0]?.charAt(0).toUpperCase().concat(argv._[0]?.slice(1));
           const helpEmbed = new MessageEmbed({
             title: `${ cmdName ?? "Chevbot"} Help`,
-            color: 0x00ff00,
+            color: "#FDE15B",
             description: `\`\`\`${output}\`\`\``
           });
           channel.send(helpEmbed);

@@ -71,5 +71,5 @@ export async function handler ({ discord }) {
       );
     };
   }
-  message.reply("...done.");
+  await message.reply("...done.");
 }

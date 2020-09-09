@@ -10,7 +10,7 @@ export async function handler ({ discord }) {
   const message = discord.message as Message;
   const embed = new MessageEmbed()
     .setTitle("Poker Hand Rankings")
-    .setColor(0x00ff00)
+    .setColor("#FDE15B")
     .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
     .addField(
       "Royal Flush",
@@ -94,5 +94,5 @@ export async function handler ({ discord }) {
     )
     .attachFiles(["./images/chevtek.png"])
     .setFooter("Created by Chevtek", "attachment://chevtek.png");
-  message.reply(embed);
+  await message.reply(embed);
 }

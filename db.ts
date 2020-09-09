@@ -26,7 +26,7 @@ export async function initializeDb() {
     { offerThroughput: 400 }
   );
   containers.tables = tables;
-  const { container: players } = await database.containers.createIfNotExists(
+  const { container: accounts } = await database.containers.createIfNotExists(
     { id: "accounts" },
     { offerThroughput: 400 }
   );

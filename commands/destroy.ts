@@ -25,16 +25,16 @@ export async function handler ({ discord }) {
       },
       { max: 1, time: 15000, errors: ["time"] }
     );
-    await Promise.all(table.players.map(async player => {
-      if (!player) return;
-      const account = await Account.findByIdAndGuild(player.id, table!.channel.guild.id);
+    for (const player of table.players) {
+      if (!player) continue;
+      const account = await Account.findByPlayerAndGuild(player.id, table!.channel.guild.id);
       if (!account) {
         await message.reply(`Unable to find player ${player.id} in DB. Unable to return stack.`);
         return;
       }
       account.bankroll += player.stackSize;
-      return account.saveToDb();
-    }));
+      await account.saveToDb();
+    };
     table.prompt?.resolve?.();
     await table.deleteFromDb();
     await message.reply("The Hold'em table for this channel has been deleted.");

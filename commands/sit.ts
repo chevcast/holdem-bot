@@ -24,29 +24,30 @@ export const builder = yargs => yargs
 export async function handler ({ discord, buyIn, seat }) {
   const message = discord.message as Message;
   if (message.channel.type === "dm") {
-    message.reply("This command can only be run from a channel on a server.");
+    await message.reply("This command can only be run from a channel on a server.");
     return;
   }
   const table = await Table.findByChannelId(message.channel.id);
   if (!table) {
-    message.reply("There is no active Hold'em game in this channel.");
+    await message.reply("There is no active Hold'em game in this channel.");
     return;
   }
   const existingTable = await Table.findByPlayerId(message.author.id);
   if (existingTable && table.channel.id !== existingTable.channel.id) {
-    message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
+    await message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
     return;
   }
   try {
     table.sitDown(message.author.id, buyIn || table.buyIn, seat ? seat - 1: undefined);
-    const account = (await Account.findByIdAndGuild(message.author.id, message.guild!.id))
+    const account = (await Account.findByPlayerAndGuild(message.author.id, message.guild!.id))
       ?? new Account(
         message.author.id,
         message.guild!.id,
-        parseInt(DEFAULT_BANKROLL) - (buyIn || table.buyIn)
+        parseInt(DEFAULT_BANKROLL)
       );
+    account.bankroll -= buyIn || table.buyIn;
     await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
   } catch (err) {
-    message.reply(err.message);
+    await message.reply(err.message);
   }
 }

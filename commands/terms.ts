@@ -1,5 +1,4 @@
-import { Message, MessageEmbed } from "discord.js";
-import discordClient from "../discord-client";
+import { Message } from "discord.js";
 import fs from "fs";
 import util from "util";
 

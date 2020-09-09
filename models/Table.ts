@@ -191,7 +191,7 @@ export class Table extends TableBase {
 
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
-        .setColor(0x00ff00)
+        .setColor("#FDE15B")
         .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
         .attachFiles([pokerTable, "./images/chevtek.png"])
         .setImage("attachment://pokerTable.png")
@@ -296,7 +296,7 @@ export class Table extends TableBase {
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
     }
-    return tables.item(this.channel.id).delete();
+    return tables.item(this.channel.id, "/_partitionKey").delete();
   }
 
   populateFromDoc(doc: any) {
@@ -338,7 +338,7 @@ export class Table extends TableBase {
     if (tableCache[channelId]) {
       return tableCache[channelId];
     }
-    const { resource: doc } = await tables.item(channelId).read();
+    const { resource: doc } = await tables.item(channelId, "/_partitionKey").read();
     if (!doc) return;
     const channel = discordClient.channels.cache.get(doc.id) as TextChannel;
     if (!channel) {
@@ -370,7 +370,7 @@ export class Table extends TableBase {
       parameters: [
         { name: "@playerId", value: playerId }
       ]
-    }).fetchAll();
+    }, { partitionKey: "/_partitionKey" }).fetchAll();
     if (!resources || resources.length === 0) return;
     const [{ c: doc }] = resources;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
