@@ -13,10 +13,10 @@ import {
 import { Table as TableBase, Card, Player, Pot } from "@chevtek/poker-engine";
 import { renderPokerTable } from "../drawing-utils";
 import { formatMoney } from "../utilities";
-import { Prompt } from "./Prompt";
 import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
+import { Account, Prompt } from ".";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -124,7 +124,7 @@ export class Table extends TableBase {
             const user = this.channel.guild.members.cache.get(this.creatorId)?.user;
             const channel = user?.dmChannel || await user?.createDM();
             if (channel) {
-              await channel.send(`The Hold'em table in this channel has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
+              await channel.send(`Your active Hold'em table has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
             }
           } else {
             for (const player of this.players) {
@@ -132,9 +132,19 @@ export class Table extends TableBase {
               const user = this.channel.guild.members.cache.get(player.id)?.user;
               const channel = user?.dmChannel || await user?.createDM();
               if (!channel) continue;
-              await channel.send(`The Hold'em table in this channel has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
+              await channel.send(`Your active Hold'em table has been idle for ${this.autoDestructTimer} minutes and has self-destructed.`);
             }
           }
+          for (const player of this.players) {
+            if (!player) continue;
+            const account = await Account.findByPlayerAndGuild(player.id, this.channel.guild.id);
+            if (!account) {
+              await this.channel.send(`Unable to find player ${player.id} in DB. Unable to return stack.`);
+              return;
+            }
+            account.bankroll += player.stackSize;
+            await account.saveToDb();
+          };
           await this.deleteFromDb();
         } catch (err) {
           console.log(err);
