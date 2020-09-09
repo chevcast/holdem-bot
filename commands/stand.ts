@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { Table } from "../models";
+import { Table, Account } from "../models";
 
 export const command = ["stand [user]", "leave"];
 
@@ -57,8 +57,11 @@ export async function handler ({ discord, user }) {
     if (table.currentActor?.id === message.author.id) {
       table.prompt?.resolve?.();
     }
-    table.standUp(message.author.id);
-    await table.render();
+    const playersThatStood = table.standUp(message.author.id);
+    const account = await Account.findByIdAndGuild(userId, table.channel.guild.id);
+    if (!account) throw new Error("Cannot find account. Unable to return player stack.");
+    playersThatStood.forEach(({ stackSize }) => account.bankroll += stackSize);
+    await Promise.all([account.saveToDb(), table.render()]);
     if (message.author.id !== userId) {
       await message.reply(`<@${userId}> has been removed from the table.`);
     } else {

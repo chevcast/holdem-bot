@@ -1,8 +1,11 @@
 import { Message } from "discord.js";
-import { Table } from "../models";
+import { Table, Account } from "../models";
 import config from "../config";
 
-const { COMMAND_PREFIX } = config;
+const {
+  COMMAND_PREFIX,
+  DEFAULT_BANKROLL
+} = config;
 
 export const command = ["sit [seat] [buy-in]", "join"];
 
@@ -36,7 +39,13 @@ export async function handler ({ discord, buyIn, seat }) {
   }
   try {
     table.sitDown(message.author.id, buyIn || table.buyIn, seat ? seat - 1: undefined);
-    await Promise.all([table.saveToDb(), table.render()]);
+    const account = (await Account.findByIdAndGuild(message.author.id, message.guild!.id))
+      ?? new Account(
+        message.author.id,
+        message.guild!.id,
+        parseInt(DEFAULT_BANKROLL) - (buyIn || table.buyIn)
+      );
+    await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
   } catch (err) {
     message.reply(err.message);
   }

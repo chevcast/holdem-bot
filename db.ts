@@ -14,7 +14,7 @@ const client = new CosmosClient({
 
 interface containers {
   tables?: Container,
-  players?: Container
+  accounts?: Container
 }
 
 let containers: containers = {};
@@ -27,10 +27,10 @@ export async function initializeDb() {
   );
   containers.tables = tables;
   const { container: players } = await database.containers.createIfNotExists(
-    { id: "players" },
+    { id: "accounts" },
     { offerThroughput: 400 }
   );
-  containers.players = players;
+  containers.accounts = accounts;
 }
 
 export default containers;

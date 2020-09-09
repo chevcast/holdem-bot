@@ -1,9 +1,12 @@
 import { Message, TextChannel } from "discord.js";
 import { gameLoop } from "../utilities";
-import { Table } from "../models";
+import { Table, Account } from "../models";
 import config from "../config";
 
-const { COMMAND_PREFIX } = config;
+const {
+  COMMAND_PREFIX,
+  DEFAULT_BANKROLL
+} = config;
 
 export const command = ["create", "poker", "holdem"];
 
@@ -89,6 +92,16 @@ export async function handler (argv) {
         },
         { max: 1, time: 20000, errors: ["time"] }
       );
+      await Promise.all(table.players.map(async player => {
+        if (!player) return;
+        const account = await Account.findByIdAndGuild(player.id, message.guild!.id);
+        if (!account) {
+          await message.reply(`Unable to find player ${player.id} in DB. Unable to return stack.`);
+          return;
+        }
+        account.bankroll += player.stackSize;
+        return account.saveToDb();
+      }));
       table.prompt?.resolve?.();
       await table.deleteFromDb();
     } catch (err) {
@@ -115,5 +128,11 @@ export async function handler (argv) {
   // Do not auto move dealer. We want to manually move the dealer after a win.
   table.autoMoveDealer = false;
   table.sitDown(message.author.id, buyIn || table.buyIn);
-  await Promise.all([table.saveToDb(), table.render()]);
+  const creator = (await Account.findByIdAndGuild(message.author.id, message.guild!.id))
+    ?? new Account(
+      message.author.id,
+      message.guild!.id,
+      parseInt(DEFAULT_BANKROLL) - (buyIn || minBuyIn)
+    )
+  await Promise.all([table.saveToDb(), creator.saveToDb(), table.render()]);
 }
