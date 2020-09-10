@@ -231,7 +231,7 @@ export class Table extends TableBase {
         player.showCards = true
       });
       const user = this.channel.guild!.members.cache.get(this.creatorId)!.user;
-      await user.send(await generateGameEmbed("#AF5F00"));
+      await user.send(await generateGameEmbed("#FF5E13"));
       return;
     } else if (!this.currentRound && this.handNumber === 0) {
       return;

@@ -6,6 +6,7 @@ export default async function (message: Message) {
     // Post in other DMs and channel.
     const table = await Table.findByPlayerId(message.author.id);
     if (!table) return;
+    if (table.prompt && table.prompt.awaitMessages?.filter(message)) return;
     const member = table.channel.guild.members.cache.get(message.author.id);
     // Send to channel.
     table.channel.send(`**${member!.displayName}:** ${message.content}`);
