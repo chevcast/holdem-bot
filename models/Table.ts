@@ -243,7 +243,7 @@ export class Table extends TableBase {
       const oldValue = player.showCards;
       player.showCards = true;
       const user = this.channel.guild!.members.cache.get(player.id)!.user;
-      await user.send(await generateGameEmbed(this.currentActor === player ? "#ff0000" : "#FDE15B"));
+      await user.send(await generateGameEmbed(this.currentActor === player ? "#00ff00" : "#FDE15B"));
       player.showCards = oldValue;
     }
   }
