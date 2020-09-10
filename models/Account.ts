@@ -30,6 +30,19 @@ export class Account {
     if (!accounts) throw new Error("Unable to delete account. No database container.");
     return accounts.item(this.id, "/_partitionKey").delete();
   }
+  
+  static async findByGuildId(guildId: string) {
+    const { accounts } = db;
+    if(!accounts) throw new Error("Unable to find account. No database container.");
+    const { resources: docs } = await accounts.items.query({
+      query: "SELECT * FROM c WHERE c.guildId=@guildId",
+      parameters: [
+        { name: "@guildId", value: guildId }
+      ]
+    }).fetchAll();
+    if (!docs || docs.length === 0) return;
+    return docs.map(doc => new Account(doc.playerId, doc.guildId, doc.bankroll));
+  }
 
   static async findByPlayerId(playerId: string) {
     const { accounts } = db;
@@ -41,7 +54,7 @@ export class Account {
       ]
     }, { partitionKey: "/_partitionKey" }).fetchAll();
     if (!docs || docs.length === 0) return;
-    return docs.map(doc => new Account(doc.id, doc.guildId, doc.bankroll));
+    return docs.map(doc => new Account(doc.playerId, doc.guildId, doc.bankroll));
   }
 
   static async findByPlayerAndGuild(playerId: string, guildId: string) {
