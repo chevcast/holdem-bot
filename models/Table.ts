@@ -17,6 +17,7 @@ import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
 import { Account, Prompt } from ".";
+import { table } from "console";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -309,6 +310,9 @@ export class Table extends TableBase {
     if (this.autoDestructTimeout) {
       clearTimeout(this.autoDestructTimeout);
     }
+    delete this.currentRound;
+    this.cleanUp();
+    this.prompt?.resolve?.();
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
     }
