@@ -7,7 +7,7 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 ---------------
 
-**`$bankroll [user]`**  
+**`$bankroll, $bank [user]`**  
 _(DM or Channel)_  
 Show a user's bankrolls.
 > **`--user <@mention>`**  
@@ -33,11 +33,11 @@ Create a Hold'em table in the current channel.
 > **`--reset`**  
 > Create a new table and override any existing table.  
 
-**`$deal`**  
+**`$deal, $d`**  
 _(DM or Channel)_  
 Deal the cards and begin the hand! The table creator or the player in the dealer position can run this command.
 
-**`$sit [seat] [buy-in]`**  
+**`$sit, $s [seat] [buy-in]`**  
 _(Channel Only)_  
 Take a seat at the active Hold'em table.  
 > **`--seat <number>`**  
@@ -51,6 +51,10 @@ Stand up from your current table. If you are the table owner you can optionally 
 > **`--user <@mention>`**  
 > @mention a user to remove that user from the table. Only allowed if you're the table owner.
 
+**`$leaderboard, $lb`**  
+_(Channel Only)_  
+Display a list of all player bankrolls for this server.
+
 **`$hands`**  
 _(DM or Channel)_  
 Show poker hand rankings guide.
@@ -59,7 +63,7 @@ Show poker hand rankings guide.
 _(DM or Channel)_  
 Display a glossary of poker terminology.
 
-**`$refresh`**  
+**`$refresh, $r`**  
 _(DM or Channel)_  
 Refresh the current table. Useful if the table has been scrolled out of view by chatter.
 

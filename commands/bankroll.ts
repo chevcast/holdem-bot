@@ -5,7 +5,7 @@ import { formatMoney } from "../utilities";
 
 const { DEFAULT_BANKROLL } = config;
 
-export const command = ["bankroll [user]", "bankrolls", "bank", "me", "account", "accounts"];
+export const command = ["bankroll [user]", "bankrolls", "bank"];
 
 export const definition = "Show a user's bankroll.";
 

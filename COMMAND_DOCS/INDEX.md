@@ -18,6 +18,8 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 **`$stand [user]`** _(DM or Channel)_ - Stand up from your current table. If you are the table owner you can optionally specify a user to forcibly remove them.
 
+**`$leaderboard, $lb`** _(Channel Only)_ - Display a list of all player bankrolls for this server.
+
 **`$hands`** _(DM or Channel)_ - Show poker hand rankings guide.
 
 **`$terms`** _(DM or Channel)_ - Display a glossary of poker terminology.
