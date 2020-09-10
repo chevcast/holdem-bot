@@ -144,8 +144,8 @@ export default async function (table: Table) {
             "Open the bet.",
             yargs => yargs.number("amount").required("amount"),
             async ({ amount }) => {
-              player.betAction(amount);
-              lastAction = `${playerName} bet \`$${amount}\`.`;
+              player.betAction(Math.floor(amount));
+              lastAction = `${playerName} bet \`$${Math.floor(amount)}\`.`;
               await table.playRandomSound("./sounds/bet-raise");
             }
           )
@@ -174,8 +174,8 @@ export default async function (table: Table) {
             "Raise the current bet.",
             yargs => yargs.number("amount").required("amount"),
             async ({ amount }) => {
-              player.raiseAction(amount);
-              lastAction = `${playerName} raised to \`$${amount}\`.`;
+              player.raiseAction(Math.floor(amount));
+              lastAction = `${playerName} raised to \`$${Math.floor(amount)}\`.`;
               await table.playRandomSound("./sounds/bet-raise");
             }
           )
