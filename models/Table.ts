@@ -191,7 +191,7 @@ export class Table extends TableBase {
   }
 
   async render() {
-    const generateGameEmbed = async () => {
+    const generateGameEmbed = async (embedColor: string) => {
       const pokerTable = new MessageAttachment(
         await renderPokerTable(this),
         "pokerTable.png"
@@ -204,7 +204,7 @@ export class Table extends TableBase {
 
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
-        .setColor("#FDE15B")
+        .setColor(embedColor)
         .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
         .attachFiles([pokerTable, "./images/chevtek.png"])
         .setImage("attachment://pokerTable.png")
@@ -224,14 +224,14 @@ export class Table extends TableBase {
       }
       return gameEmbed;
     };
-    await this.channel.send(await generateGameEmbed());
+    await this.channel.send(await generateGameEmbed("#FDE15B"));
     if (this.debug) {
       this.players.forEach(player => {
         if (!player) return;
         player.showCards = true
       });
       const user = this.channel.guild!.members.cache.get(this.creatorId)!.user;
-      await user.send(await generateGameEmbed());
+      await user.send(await generateGameEmbed("#AF5F00"));
       return;
     } else if (!this.currentRound && this.handNumber === 0) {
       return;
@@ -242,7 +242,7 @@ export class Table extends TableBase {
       const oldValue = player.showCards;
       player.showCards = true;
       const user = this.channel.guild!.members.cache.get(player.id)!.user;
-      await user.send(await generateGameEmbed());
+      await user.send(await generateGameEmbed(this.currentActor === player ? "#ff0000" : "#FDE15B"));
       player.showCards = oldValue;
     }
   }
