@@ -192,11 +192,17 @@ export class Table extends TableBase {
   }
 
   async render() {
-    const generateGameEmbed = async (embedColor: string) => {
+    const generateGameEmbed = async (currentPlayer?: Player) => {
       const pokerTable = new MessageAttachment(
-        await renderPokerTable(this),
+        await renderPokerTable(this, currentPlayer),
         "pokerTable.png"
       );
+      let color = "#FDE15B";
+      if (this.debug) {
+        color = "#FF5E13";
+      } else if (this.currentActor === currentPlayer) {
+        color = "#00FF00";
+      }
       const gameEmbed = new MessageEmbed()
         .setTitle(`Hold'em Table\n${this.channel.guild.name}\n#${this.channel.name}`)
         .setDescription(`
@@ -205,7 +211,7 @@ export class Table extends TableBase {
 
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
         `.split("\n").map(line => line.trim()).join("\n"))
-        .setColor(embedColor)
+        .setColor(color)
         .setThumbnail(discordClient.user!.avatarURL({ format: "png" })!)
         .attachFiles([pokerTable, "./images/chevtek.png"])
         .setImage("attachment://pokerTable.png")
@@ -225,26 +231,22 @@ export class Table extends TableBase {
       }
       return gameEmbed;
     };
-    await this.channel.send(await generateGameEmbed("#FDE15B"));
+    await this.channel.send(await generateGameEmbed());
     if (this.debug) {
       this.players.forEach(player => {
         if (!player) return;
         player.showCards = true
       });
       const user = this.channel.guild!.members.cache.get(this.creatorId)!.user;
-      await user.send(await generateGameEmbed("#FF5E13"));
+      await user.send(await generateGameEmbed());
       return;
     } else if (!this.currentRound && this.handNumber === 0) {
       return;
     }
-    for (let index = 0; index < this.players.length; index++) {
-      const player = this.players[index];
+    for (const player of this.players.filter(player => player !== null)) {
       if (!player) continue;
-      const oldValue = player.showCards;
-      player.showCards = true;
       const user = this.channel.guild!.members.cache.get(player.id)!.user;
-      await user.send(await generateGameEmbed(this.currentActor === player ? "#00ff00" : "#FDE15B"));
-      player.showCards = oldValue;
+      await user.send(await generateGameEmbed(player));
     }
   }
 

@@ -1,7 +1,7 @@
 import { createCanvas, registerFont, loadImage } from "canvas";
 import { calcShapePoints, roundRect } from ".";
 import { formatMoney } from "../utilities";
-import { CardSuit, Card, BettingRound, CardRank } from "@chevtek/poker-engine";
+import { CardSuit, Card, BettingRound, CardRank, Player } from "@chevtek/poker-engine";
 import { Table } from "../models";
 import config from "../config";
 
@@ -20,7 +20,7 @@ const suitChar = (suit: CardSuit) => {
   }
 };
 
-export default async function (table: Table): Promise<Buffer> {
+export default async function (table: Table, currentPlayer?: Player): Promise<Buffer> {
 
   registerFont("./fonts/arial.ttf", { family: "sans-serif" });
   registerFont("./fonts/arialbd.ttf", { family: "sans-serif" });
@@ -246,7 +246,7 @@ export default async function (table: Table): Promise<Buffer> {
 
       await drawAvatar();
       await drawBudget();
-      player.showCards && await drawHoleCards();
+      (player.showCards || player === currentPlayer) && await drawHoleCards();
       await drawNameplate();
       (player.stackSize === 0 || player.left) && !table.currentRound && await drawBusted();
     }
