@@ -12,11 +12,12 @@ export async function handler ({ discord }) {
     message.reply("This command can only be run in a channel on a server.");
     return;
   }
-  const accounts = await Account.findByGuildId(message.guild!.id);
+  let accounts = await Account.findByGuildId(message.guild!.id);
   if (!accounts) {
     message.reply("Nobody on this sever has a bankroll.");
     return;
   }
+  accounts = accounts.sort((a, b) => b.bankroll - a.bankroll);
   const newEmbed = () => new MessageEmbed()
     .setTitle(`${message.guild!.name} Leader Board`)
     .setColor("#FDE15B")
