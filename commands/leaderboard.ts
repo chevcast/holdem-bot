@@ -1,12 +1,8 @@
 import { Message, MessageEmbed } from "discord.js";
 import { Account } from "../models";
-import config from "../config";
 import { formatMoney } from "../utilities";
-import { format } from "path";
 
-const { DEFAULT_BANKROLL } = config;
-
-export const command = ["leadboard", "leader", "lb"];
+export const command = ["leaderboard", "leader", "lb"];
 
 export const definition = "Show all bankrolls on a server in descending order.";
 
