@@ -28,7 +28,7 @@ Setting up Hold'em Bot is easy. Here are the quickest steps to starting a quick 
 Nope! Players can type into the channel or the DM where they are playing a hand and the message will be relayed to the other players' DMs as well as the channel where the game started. Even messages from people watching the game in-channel wil be relayed to the players and vice versa. This makes it easy to communicate via text while playing!
 
 ### **Is there a "party leader" of some kind?**  
-Yes. The creator of the table is the table _owner_. If that player leaves then the owner will be passed to someone else and it will notify who the new owner is. The owner can run the `$deal` command even if they are not the dealer. If all players leave (`$stand`) then the table will be destroyed automatically.
+Yes. The creator of the table is the table _owner_. If that player leaves then the owner will be passed to someone else and it will notify who the new owner is. The owner can run the `$deal` command even if they are not the dealer. They can also forcibly remove players by @mentioning the user they want to remove when issuing the `$stand` command (e.g. `$stand @Chev`). Note: Must be a proper Discord @mention that turns blue within Discord.
 
 ### **I heard there were sound effects, how do they work?**  
 If the table owner is in a voice channel that is visible to the bot then the bot will join that channel and play sound effects for the game! To disable this behavior pass the `--no-sound` flag when creating a new table (e.g. `$create --no-sound`).
