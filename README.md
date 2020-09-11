@@ -9,7 +9,7 @@ If you have any issues please submit them [here](https://github.com/chevtek/hold
 
 **`$bankroll, $bank [user]`**  
 _(DM or Channel)_  
-Show a user's bankrolls.
+Show a user's bankrolls.  
 > **`--user <@mention>`**  
 > @mention a user to show their bankrolls. Defaults to yourself if no user is mentioned.
 
@@ -18,6 +18,10 @@ _(Channel Only)_
 Create a Hold'em table in the current channel.  
 > **`--min-buy-in <number>`**  
 > Specify a minimum buy-in amount for the table. Default is $1000.  
+> **`--tournament, -t`**  
+> Specifies the table is a tournament table. Disables joins after the first hand has begun and enforces minimum buy-in only.  
+> **`--blind-increase-timer <number>`**  
+> How often (in minutes) the blinds should double. 0 to disable. Default is 0 for cash tables and 30 for tournament tables.  
 > **`--no-sound`**  
 > Disable sound effects for this table.  
 > **`--small-blind <number>`**  
