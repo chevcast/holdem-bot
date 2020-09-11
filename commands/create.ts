@@ -36,7 +36,7 @@ export const builder = {
     default: true
   },
   "tournament": {
-    aliases: "t",
+    alias: "t",
     default: false,
     description: "Disable joins after the first hand is dealt and enforce minimum buy-in only.",
     type: "boolean"
@@ -137,11 +137,11 @@ export async function handler (argv) {
   table = new Table(
     message.author.id,
     message.channel as TextChannel,
-    blindIncreaseTimer ?? (tournament ? 30 : 0),
     minBuyIn,
     smallBlind,
     bigBlind
   );
+  table.blindIncreaseTimer = blindIncreaseTimer ?? (tournament ? 30 : 0),
   table.sound = sound;
   table.tournamentMode = tournament;
   table.turnTimer = turnTimer;

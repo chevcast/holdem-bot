@@ -32,6 +32,7 @@ export class Table extends TableBase {
   autoDestructTimer: number = 0;
   autoDestructTimeout?: NodeJS.Timeout;
   blindIncreaseInterval?: NodeJS.Timeout;
+  blindIncreaseTimer: number = 0;
   prompt?: Prompt;
   sound = true;
   tournamentMode: boolean = false;
@@ -42,27 +43,36 @@ export class Table extends TableBase {
   constructor(
     public creatorId: string,
     public channel: TextChannel,
-    public blindIncreaseTimer: number = 0,
     minBuyIn?: number,
     smallBlind?: number,
     bigBlind?: number
   ) {
     super(minBuyIn, smallBlind, bigBlind);
-    if (blindIncreaseTimer > 0) {
+  }
+
+  dealCards() {
+    if (this.blindIncreaseTimer > 0 && this.handNumber === 0) {
       this.startBlindTimer();
     }
+    super.dealCards();
   }
 
   async startBlindTimer() {
     this.blindIncreaseInterval = setInterval(async () => {
+      await this.channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
+      await Promise.all(this.players.filter(p => p !== null).map(async player => {
+        const user = this.channel.guild.members.cache.get(player!.id)!.user;
+        const channel = user.dmChannel || await user.createDM();
+        await channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
+      }));
       try {
         this.smallBlind *= 2;
         this.bigBlind *= 2;
-        await this.channel.send(`Blinds have been increased to ${this.smallBlind}/${this.bigBlind}!`);
+        await this.channel.send(`Blinds have been increased to **${formatMoney(this.smallBlind)}/${formatMoney(this.bigBlind)}**!`);
         await Promise.all(this.players.filter(p => p !== null).map(async player => {
           const user = this.channel.guild.members.cache.get(player!.id)!.user;
           const channel = user.dmChannel || await user.createDM();
-          await channel.send(`Blinds have been increased to ${this.smallBlind}/${this.bigBlind}!`);
+          await channel.send(`Blinds have been increased to **${formatMoney(this.smallBlind)}/${formatMoney(this.bigBlind)}**!`);
         }));
         await this.saveToDb();
       } catch (err) {
@@ -227,9 +237,10 @@ export class Table extends TableBase {
         color = "#00FF00";
       }
       const gameEmbed = new MessageEmbed()
-        .setTitle(`Hold'em Table\n${this.channel.guild.name}\n#${this.channel.name}`)
+        .setTitle(`${this.tournamentMode ? "Tournament" : "Cash"} Table\n${this.channel.guild.name}\n#${this.channel.name}`)
         .setDescription(`
           **Buy-in:** ${formatMoney(this.buyIn)}
+          **Blinds:** ${formatMoney(this.smallBlind)}/${formatMoney(this.bigBlind)}
           **Players:** ${this.players.filter(player => player !== null).length}
 
           > **Type \`${COMMAND_PREFIX}sit\` to play!**
@@ -397,9 +408,12 @@ export class Table extends TableBase {
       await tables.item(doc.id).delete();
       return;
     }
-    const table = (new Table(doc.creatorId, channel, doc.blindIncreaseTimer)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
+    }
+    if (table.blindIncreaseTimer && table.blindIncreaseTimer > 0 && table.handNumber > 0) {
+      table.startBlindTimer();
     }
     return table;
   }
@@ -430,9 +444,12 @@ export class Table extends TableBase {
       await tables.item(doc.id).delete();
       return;
     }
-    const table = (new Table(doc.creatorId, channel, doc.blindIncreaseTimer)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
+    }
+    if (table.blindIncreaseTimer && table.blindIncreaseTimer > 0 && table.handNumber > 0) {
+      table.startBlindTimer();
     }
     return table;
   }
