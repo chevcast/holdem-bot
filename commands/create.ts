@@ -1,8 +1,7 @@
 import { Message, TextChannel } from "discord.js";
-import { gameLoop } from "../utilities";
+import { formatMoney, gameLoop } from "../utilities";
 import { Table, Account } from "../models";
 import config from "../config";
-import { min } from "moment";
 
 const {
   COMMAND_PREFIX,
@@ -25,21 +24,31 @@ export const builder = {
   },
   "big-blind": {
     description: "Specify the amount of the big blind.",
-    default: 20
+    default: 10
   },
   "small-blind": {
     description: "Specify the amount of the small blind.",
-    default: 10
+    default: 5
   },
   "sound": {
     description: "If false this will disable sound effects for this table.",
     type: "boolean",
     default: true
   },
+  "tournament": {
+    aliases: "t",
+    default: false,
+    description: "Disable joins after the first hand is dealt and enforce minimum buy-in only.",
+    type: "boolean"
+  },
   "turn-timer": {
-    description: "The number of seconds a player has on their turn before they auto-fold.",
+    description: "The number of seconds a player has on their turn before they auto-fold. 0 to disable.",
     type: "number",
     default: 45
+  },
+  "blind-increase-timer": {
+    description: "How many minutes into the game the blinds should be doubled. 0 to disable. Default is 0 for cash tables and 30 for tournament tables.",
+    type: "number"
   },
   "auto-destruct-timer": {
     description: "The number of minutes to wait before a table becomes idle and is automatically destroyed.",
@@ -64,7 +73,9 @@ export async function handler (argv) {
     bigBlind,
     smallBlind,
     sound,
+    tournament,
     turnTimer,
+    blindIncreaseTimer,
     autoDestructTimer,
     reset,
     debug
@@ -115,14 +126,24 @@ export async function handler (argv) {
     await message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
     return;
   }
+  if (tournament && buyIn && buyIn !== minBuyIn) {
+    await message.reply(`You can only buy into a tournament table for the minimum amount (${formatMoney(minBuyIn)}).`);
+    return;
+  }
+  if (buyIn && buyIn < minBuyIn) {
+    await message.reply(`You cannot buy in for less than the minimum buy-in (${formatMoney(minBuyIn)}).`);
+    return;
+  }
   table = new Table(
     message.author.id,
     message.channel as TextChannel,
+    blindIncreaseTimer ?? (tournament ? 30 : 0),
     minBuyIn,
     smallBlind,
     bigBlind
   );
   table.sound = sound;
+  table.tournamentMode = tournament;
   table.turnTimer = turnTimer;
   table.autoDestructTimer = autoDestructTimer;
   table.debug = debug;

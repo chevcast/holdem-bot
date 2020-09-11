@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 import { Table, Account } from "../models";
 import config from "../config";
+import { formatMoney } from "../utilities";
 
 const {
   COMMAND_PREFIX,
@@ -35,6 +36,20 @@ export async function handler ({ discord, buyIn, seat }) {
   const existingTable = await Table.findByPlayerId(message.author.id);
   if (existingTable && table.channel.id !== existingTable.channel.id) {
     await message.reply(`You have already joined a table. Use \`${COMMAND_PREFIX}stand\` from your Hold'em Bot PM to leave your active table.`);
+    return;
+  }
+  if (table.tournamentMode) {
+    if (table.handNumber > 0) {
+      await message.reply("This table is a tournament mode table. Joining after the first hand has begun is disallowed.");
+      return;
+    }
+    if (buyIn && buyIn !== table.buyIn) {
+      await message.reply(`You cannot buy into a tournament table for more than the minimum buy-in (${formatMoney(table.buyIn)}).`)
+      return;
+    }
+  }
+  if (buyIn && buyIn < table.buyIn) {
+    await message.reply(`You cannot buy in for less than the minimum buy-in (${formatMoney(table.buyIn)}).`);
     return;
   }
   try {

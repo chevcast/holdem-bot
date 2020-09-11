@@ -17,7 +17,6 @@ import config from "../config";
 import db from "../db";
 import discordClient from "../discord-client";
 import { Account, Prompt } from ".";
-import { table } from "console";
 
 const readDir = util.promisify(fs.readdir);
 
@@ -32,8 +31,10 @@ export class Table extends TableBase {
 
   autoDestructTimer: number = 0;
   autoDestructTimeout?: NodeJS.Timeout;
+  blindIncreaseInterval?: NodeJS.Timeout;
   prompt?: Prompt;
   sound = true;
+  tournamentMode: boolean = false;
   turnTimer: number = 0;
   voiceConnection?: VoiceConnection;
   voiceTimeout?: NodeJS.Timeout;
@@ -41,11 +42,33 @@ export class Table extends TableBase {
   constructor(
     public creatorId: string,
     public channel: TextChannel,
+    public blindIncreaseTimer: number = 0,
     minBuyIn?: number,
     smallBlind?: number,
     bigBlind?: number
   ) {
     super(minBuyIn, smallBlind, bigBlind);
+    if (blindIncreaseTimer > 0) {
+      this.startBlindTimer();
+    }
+  }
+
+  async startBlindTimer() {
+    this.blindIncreaseInterval = setInterval(async () => {
+      try {
+        this.smallBlind *= 2;
+        this.bigBlind *= 2;
+        await this.channel.send(`Blinds have been increased to ${this.smallBlind}/${this.bigBlind}!`);
+        await Promise.all(this.players.filter(p => p !== null).map(async player => {
+          const user = this.channel.guild.members.cache.get(player!.id)!.user;
+          const channel = user.dmChannel || await user.createDM();
+          await channel.send(`Blinds have been increased to ${this.smallBlind}/${this.bigBlind}!`);
+        }));
+        await this.saveToDb();
+      } catch (err) {
+        await this.channel.send(err.message);
+      }
+    }, this.blindIncreaseTimer * 60 * 1000);
   }
 
   async createPrompt(prompt: Prompt) {
@@ -259,6 +282,7 @@ export class Table extends TableBase {
       autoMoveDealer: this.autoMoveDealer,
       bigBlind: this.bigBlind,
       bigBlindPosition: this.bigBlindPosition,
+      blindIncreaseTimer: this.blindIncreaseTimer,
       buyIn: this.buyIn,
       communityCards: this.communityCards.map(card => ({
         rank: card.rank,
@@ -311,6 +335,9 @@ export class Table extends TableBase {
     if (!tables) throw new Error("Unable to delete table. No container found.");
     if (this.autoDestructTimeout) {
       clearTimeout(this.autoDestructTimeout);
+    }
+    if (this.blindIncreaseInterval) {
+      clearInterval(this.blindIncreaseInterval);
     }
     delete this.currentRound;
     this.cleanUp();
@@ -370,7 +397,7 @@ export class Table extends TableBase {
       await tables.item(doc.id).delete();
       return;
     }
-    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel, doc.blindIncreaseTimer)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
       tableCache[channelId] = table;
     }
@@ -403,7 +430,7 @@ export class Table extends TableBase {
       await tables.item(doc.id).delete();
       return;
     }
-    const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
+    const table = (new Table(doc.creatorId, channel, doc.blindIncreaseTimer)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {
       tableCache[channel.id] = table;
     }
