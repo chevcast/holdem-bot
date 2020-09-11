@@ -58,13 +58,13 @@ export class Table extends TableBase {
   }
 
   async startBlindTimer() {
+    await this.channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
+    await Promise.all(this.players.filter(p => p !== null).map(async player => {
+      const user = this.channel.guild.members.cache.get(player!.id)!.user;
+      const channel = user.dmChannel || await user.createDM();
+      await channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
+    }));
     this.blindIncreaseInterval = setInterval(async () => {
-      await this.channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
-      await Promise.all(this.players.filter(p => p !== null).map(async player => {
-        const user = this.channel.guild.members.cache.get(player!.id)!.user;
-        const channel = user.dmChannel || await user.createDM();
-        await channel.send(`Blinds will double in **${this.blindIncreaseTimer} minutes**.`);
-      }));
       try {
         this.smallBlind *= 2;
         this.bigBlind *= 2;
