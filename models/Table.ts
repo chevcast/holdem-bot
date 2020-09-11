@@ -233,7 +233,7 @@ export class Table extends TableBase {
       let color = "#FDE15B";
       if (this.debug) {
         color = "#FF5E13";
-      } else if (this.currentActor === currentPlayer) {
+      } else if (this.currentRound && this.currentActor === currentPlayer) {
         color = "#00FF00";
       }
       const gameEmbed = new MessageEmbed()
