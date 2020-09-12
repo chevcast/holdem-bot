@@ -233,10 +233,23 @@ export default async function (table: Table) {
           table.cleanUp();
           // Manually move dealer after a win so we can tell who the next dealer is and allow them to issue the deal command.
           table.moveDealer(table.dealerPosition! + 1)
-          const dealerPlayer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
-          const channel = dealerPlayer.dmChannel || await dealerPlayer.createDM();
-          channel.send(`<@${dealerPlayer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
           table.beginAutoDestructSequence();
+          await new Promise((resolve, reject) => setTimeout(async () => {
+            try {
+              await table.render()
+              const dealerPlayer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
+              const channel = dealerPlayer.dmChannel || await dealerPlayer.createDM();
+              channel.send(`<@${dealerPlayer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
+              await Promise.all(table.players.filter(player => player !== null).map(async player => {
+                const member = table.channel.guild.members.cache.get(player!.id)!;
+                const channel = member.user.dmChannel || await member.user.createDM();
+                await channel.send(`${member.displayName} is now the dealer.`);
+              }));
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          }, 5000));
         }
         await table.saveToDb();
 
