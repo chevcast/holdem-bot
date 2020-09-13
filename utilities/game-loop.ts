@@ -237,13 +237,13 @@ export default async function (table: Table) {
           await new Promise((resolve, reject) => setTimeout(async () => {
             try {
               await table.render()
-              const dealerPlayer = table.channel.guild.members.cache.get(table.dealer!.id)!.user;
-              const channel = dealerPlayer.dmChannel || await dealerPlayer.createDM();
-              channel.send(`<@${dealerPlayer.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
+              const dealerMember = table.channel.guild.members.cache.get(table.dealer!.id)!;
+              const channel = dealerMember.user.dmChannel || await dealerMember.user.createDM();
+              channel.send(`<@${dealerMember.id}>, You are the next dealer. You can run \`${COMMAND_PREFIX}deal\` when you are ready to begin the next hand.`);
               await Promise.all(table.players.filter(player => player !== null).map(async player => {
                 const member = table.channel.guild.members.cache.get(player!.id)!;
                 const channel = member.user.dmChannel || await member.user.createDM();
-                await channel.send(`${member.displayName} is now the dealer.`);
+                await channel.send(`${dealerMember.displayName} is now the dealer.`);
               }));
               resolve();
             } catch (err) {
