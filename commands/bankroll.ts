@@ -30,7 +30,7 @@ export async function handler ({ discord, user: mention }) {
       || accounts.filter(account =>
         account.guildId === message.guild!.id).length === 0))
   {
-    const account = new Account(userId, message.guild.id, parseInt(DEFAULT_BANKROLL));
+    const account = new Account(userId, message.guild.id, parseInt(DEFAULT_BANKROLL), message.member!.displayName);
     await account.saveToDb();
     if (!accounts) accounts = [];
     accounts.push(account);
@@ -51,19 +51,4 @@ export async function handler ({ discord, user: mention }) {
     accountsEmbed.addField(`**${guild.name}**`, formatMoney(account.bankroll), true);
   }
   await message.reply(accountsEmbed);
-  // let account = await Account.findByPlayerAndGuild(userId, message.guild!.id);
-  // if (!account) {
-  //   account = new Account(userId, message.guild!.id, parseInt(DEFAULT_BANKROLL));
-  //   await account.saveToDb();
-  // }
-  // const member = message.guild!.members.cache.get(userId);
-  // if (!member) throw new Error("Could not find server member.");
-  // const accountEmbed = new MessageEmbed()
-  //   .setTitle(`${member.guild.name}`)
-  //   .setColor("#FDE15B")
-  //   .setThumbnail(member.guild.iconURL({ format: "png" })!)
-  //   .setDescription(`**${member.displayName}'s Bankroll:** ${formatMoney(account.bankroll)}`)
-  //   .attachFiles(["./images/chevtek.png"])
-  //   .setFooter("Created by Chevtek", "attachment://chevtek.png");
-  // await message.reply(accountEmbed);
 }

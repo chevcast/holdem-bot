@@ -8,6 +8,7 @@ export class Account {
     public playerId: string,
     public guildId: string,
     public bankroll: number,
+    public name?: string
   ) {
     this.id = playerId + guildId;
   }
@@ -41,7 +42,7 @@ export class Account {
       ]
     }).fetchAll();
     if (!docs || docs.length === 0) return;
-    return docs.map(doc => new Account(doc.playerId, doc.guildId, doc.bankroll));
+    return docs.map(doc => new Account(doc.playerId, doc.guildId, doc.bankroll, doc.name));
   }
 
   static async findByPlayerId(playerId: string) {
@@ -62,7 +63,7 @@ export class Account {
     if (!accounts) throw new Error("Unable to find account. No database container.");
     const { resource: doc } = await accounts.item(playerId + guildId, "/_partitionKey").read();
     if (!doc) return;
-    return new Account(playerId, doc.guildId, doc.bankroll);
+    return new Account(playerId, doc.guildId, doc.bankroll, doc.name);
   }
 
 }
