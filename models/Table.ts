@@ -123,11 +123,7 @@ export class Table extends TableBase {
       newPrompt.timerIntervalId = setInterval(() => {
         newPrompt.remainingTime! -= interval;
         if (newPrompt.remainingTime! > 30) return;
-        if (newPrompt.remainingTime === 0) {
-          newMessage.edit(`${content}`);
-        } else {
-          newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
-        }
+        newMessage.edit(`${content}\n**${newPrompt.remainingTime!}** seconds remaining.`);
         if (newPrompt.remainingTime === 0) {
           clearInterval(newPrompt.timerIntervalId!);
           if (this.currentActor?.legalActions().includes("check")) {
