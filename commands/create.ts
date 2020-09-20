@@ -167,5 +167,6 @@ export async function handler (argv) {
     }
   }
   account.bankroll -= stack;
+  table.beginAutoDestructSequence();
   await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
 }

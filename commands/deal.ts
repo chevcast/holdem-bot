@@ -34,6 +34,7 @@ export async function handler ({ discord }) {
       }
     })();
     gameLoop(table);
+    await table.channel.send("Cards have been dealt. Visit your DMs to play! https://discord.com/channels/@me");
   } catch (err) {
     await message.reply(err.message);
   }
