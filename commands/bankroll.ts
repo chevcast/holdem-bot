@@ -30,7 +30,7 @@ export async function handler ({ discord, user: mention }) {
       || accounts.filter(account =>
         account.guildId === message.guild!.id).length === 0))
   {
-    const account = new Account(userId, message.guild.id, parseInt(DEFAULT_BANKROLL), message.member!.displayName);
+    const account = new Account(userId, message.guild.id, parseInt(DEFAULT_BANKROLL), message.member?.user.username);
     await account.saveToDb();
     if (!accounts) accounts = [];
     accounts.push(account);

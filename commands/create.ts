@@ -156,7 +156,7 @@ export async function handler (argv) {
       message.author.id,
       message.guild!.id,
       parseInt(DEFAULT_BANKROLL),
-      message.member!.displayName
+      message.member!.user.username
     );
   if (account.bankroll < stack) {
     if (stack <= parseInt(DEFAULT_BANKROLL)) {

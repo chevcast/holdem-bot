@@ -11,9 +11,9 @@ export class Account {
 
   async saveToDb() {
     const { AccountModel } = db;
-    const { playerId, guildId, bankroll } = this;
+    const { playerId, guildId, bankroll, name } = this;
     if (!AccountModel) throw new Error("Unable to save account. No database container.");
-    const doc = { playerId, guildId, bankroll };
+    const doc = { playerId, guildId, bankroll, name };
     const existingAccount = await Account.findByPlayerAndGuild(this.playerId, this.guildId);
     if (existingAccount) {
       return AccountModel.updateOne({ playerId, guildId }, doc);

@@ -60,7 +60,7 @@ export async function handler ({ discord, buyIn, seat }) {
         message.author.id,
         message.guild!.id,
         parseInt(DEFAULT_BANKROLL),
-        message.member!.displayName
+        message.member!.user.username
       );
     if (account.bankroll < stack) {
       if (stack <= parseInt(DEFAULT_BANKROLL)) {
