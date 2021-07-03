@@ -6,14 +6,15 @@ export class Account {
     public playerId: string,
     public guildId: string,
     public bankroll: number,
-    public name?: string
+    public name?: string,
+    public guildName?: string
   ) { }
 
   async saveToDb() {
     const { AccountModel } = db;
-    const { playerId, guildId, bankroll, name } = this;
+    const { playerId, guildId, bankroll, name, guildName } = this;
     if (!AccountModel) throw new Error("Unable to save account. No database container.");
-    const doc = { playerId, guildId, bankroll, name };
+    const doc = { playerId, guildId, bankroll, name, guildName };
     const existingAccount = await Account.findByPlayerAndGuild(this.playerId, this.guildId);
     if (existingAccount) {
       return AccountModel.updateOne({ playerId, guildId }, doc);
@@ -38,7 +39,8 @@ export class Account {
       account.playerId,
       account.guildId,
       account.bankroll,
-      account.name
+      account.name,
+      account.guildName
     ));
   }
 
@@ -51,7 +53,8 @@ export class Account {
       account.playerId,
       account.guildId,
       account.bankroll,
-      account.name
+      account.name,
+      account.guildName
     ));
   }
 
@@ -60,8 +63,8 @@ export class Account {
     if (!AccountModel) throw new Error("Unable to find account. No database container.");
     const accounts = await AccountModel.find({ playerId, guildId });
     if (!accounts || accounts.length === 0) return;
-    const [{ bankroll, name }] = accounts;
-    return new Account(playerId, guildId, bankroll, name);
+    const [{ bankroll, name, guildName }] = accounts;
+    return new Account(playerId, guildId, bankroll, name, guildName);
   }
 
 }
