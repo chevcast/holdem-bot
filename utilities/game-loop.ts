@@ -234,7 +234,7 @@ export default async function (table: Table) {
           // Manually move dealer after a win so we can tell who the next dealer is and allow them to issue the deal command.
           table.moveDealer(table.dealerPosition! + 1)
           table.beginAutoDestructSequence();
-          await new Promise((resolve, reject) => setTimeout(async () => {
+          await new Promise<void>((resolve, reject) => setTimeout(async () => {
             try {
               await table.render()
               const dealerMember = table.channel.guild.members.cache.get(table.dealer!.id)!;

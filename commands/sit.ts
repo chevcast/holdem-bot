@@ -70,7 +70,9 @@ export async function handler ({ discord, buyIn, seat }) {
         return;
       }
     }
-    account.bankroll -= stack;
+    if (!table.debug) {
+      account.bankroll -= stack;
+    }
     await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
   } catch (err) {
     await message.reply(err.message);

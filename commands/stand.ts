@@ -60,7 +60,9 @@ export async function handler ({ discord, user }) {
     const playersThatStood = table.standUp(userId);
     const account = await Account.findByPlayerAndGuild(userId, table.channel.guild.id);
     if (!account) throw new Error("Cannot find account. Unable to return player stack.");
-    playersThatStood.forEach(({ stackSize }) => account.bankroll += stackSize);
+    if (!table.debug) {
+      playersThatStood.forEach(({ stackSize }) => account.bankroll += stackSize);
+    }
     await Promise.all([account.saveToDb(), table.render()]);
     const leftUser = message.client.users.cache.get(userId)!;
     if (message.author.id !== userId) {

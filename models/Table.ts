@@ -280,17 +280,17 @@ export class Table extends TableBase {
     }
   }
 
-  saveToDb() {
-    const { tables } = db;
-    if (!tables) throw new Error("Unable to save poker table. No database container.");
+  async saveToDb() {
+    const { TableModel } = db;
+    if (!TableModel) throw new Error("Unable to save poker table. No database container.");
     tableCache[this.channel.id] = this;
     const doc = {
-      id: this.channel.id,
       autoMoveDealer: this.autoMoveDealer,
       bigBlind: this.bigBlind,
       bigBlindPosition: this.bigBlindPosition,
       blindIncreaseTimer: this.blindIncreaseTimer,
       buyIn: this.buyIn,
+      channelId: this.channel.id,
       communityCards: this.communityCards.map(card => ({
         rank: card.rank,
         suit: card.suit
@@ -332,14 +332,14 @@ export class Table extends TableBase {
       sound: this.sound,
       turnTimer: this.turnTimer,
       winners: this.winners?.map(player => player.id),
-      _partitionKey: "/_partitionKey"
     };
-    return tables.items.upsert(doc);
+    const existingTable = await Table.findByChannelId(this.channel.id);
+    return existingTable ? TableModel.updateOne({ channelId: this.channel.id }, doc) : TableModel.create(doc);
   }
 
   deleteFromDb() {
-    const { tables } = db;
-    if (!tables) throw new Error("Unable to delete table. No container found.");
+    const { TableModel } = db;
+    if (!TableModel) throw new Error("Unable to delete table. No container found.");
     if (this.autoDestructTimeout) {
       clearTimeout(this.autoDestructTimeout);
     }
@@ -352,7 +352,7 @@ export class Table extends TableBase {
     if (tableCache[this.channel.id]) {
       delete tableCache[this.channel.id];
     }
-    return tables.item(this.channel.id, "/_partitionKey").delete();
+    return TableModel.findOneAndDelete({ channelId: this.channel.id });
   }
 
   populateFromDoc(doc: any) {
@@ -389,20 +389,19 @@ export class Table extends TableBase {
   }
 
   static async findByChannelId(channelId: string) {
-    const { tables } = db;
-    if (!tables) throw new Error("Unable to find table. No poker table container.");
+    const { TableModel } = db;
+    if (!TableModel) throw new Error("Unable to find table. No poker table container.");
     if (tableCache[channelId]) {
       return tableCache[channelId];
     }
-    const { resource: doc } = await tables.item(channelId, "/_partitionKey").read();
+    const doc = await TableModel.findOne({ channelId });
     if (!doc) return;
-    const channel = discordClient.channels.cache.get(doc.id) as TextChannel;
+    const channel = discordClient.channels.cache.get(channelId) as TextChannel;
     if (!channel) {
-      if (tableCache[doc.id]) {
-        delete tableCache[doc.id];
+      if (tableCache[channelId]) {
+        delete tableCache[channelId];
       }
-      await tables.item(doc.id).delete();
-      return;
+      return TableModel.findByIdAndDelete(channelId);
     }
     const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channelId]) {
@@ -415,8 +414,8 @@ export class Table extends TableBase {
   }
 
   static async findByPlayerId(playerId: string) {
-    const { tables } = db;
-    if (!tables) throw new Error("Unable to find table. No poker table container.");
+    const { TableModel } = db;
+    if (!TableModel) throw new Error("Unable to find table. No poker table container.");
     for (const channelId in tableCache) {
       const table = tableCache[channelId];
       const playerMatches = table.players.filter(player => player && player.id === playerId);
@@ -424,21 +423,14 @@ export class Table extends TableBase {
         return table;
       }
     }
-    const { resources } = await tables.items.query({
-      query: "SELECT DISTINCT c FROM c JOIN pc IN c.players WHERE pc.id IN (@playerId)",
-      parameters: [
-        { name: "@playerId", value: playerId }
-      ]
-    }, { partitionKey: "/_partitionKey" }).fetchAll();
-    if (!resources || resources.length === 0) return;
-    const [{ c: doc }] = resources;
+    const doc = await TableModel.find({ playerId });
+    if (!doc || doc.length === 0) return;
     const channel = discordClient.channels.cache.get(doc.id)! as TextChannel;
     if (!channel) {
       if (tableCache[doc.id]) {
         delete tableCache[doc.id];
       }
-      await tables.item(doc.id).delete();
-      return;
+      return TableModel.findByIdAndDelete(doc.id);
     }
     const table = (new Table(doc.creatorId, channel)).populateFromDoc(doc);
     if (!tableCache[channel.id]) {

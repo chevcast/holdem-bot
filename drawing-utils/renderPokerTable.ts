@@ -397,7 +397,7 @@ export default async function (table: Table, currentPlayer?: Player): Promise<Bu
       const winnerName = table.channel.guild!.members.cache.get(winner.id)!.displayName;
       line1 = `${winnerName} wins!`;
       line2 = activePlayers.length > 1 ? winner.hand.name : "Opponents Folded";
-    } else {
+    } else if (table.winners!.length > 1) {
       const [firstWinner] = table.winners!;
       line1 = `Draw!`;
       line2 = firstWinner.hand.name;
