@@ -142,6 +142,8 @@ export async function handler (argv) {
     bigBlind
   );
   table.blindIncreaseTimer = blindIncreaseTimer ?? (tournament ? 30 : 0),
+  table.channelName = message.channel.name;
+  table.guildName = message.guild?.name;
   table.sound = sound;
   table.tournamentMode = tournament;
   table.turnTimer = turnTimer;
@@ -163,11 +165,10 @@ export async function handler (argv) {
     if (stack <= parseInt(DEFAULT_BANKROLL)) {
       account.bankroll = parseInt(DEFAULT_BANKROLL);
     } else {
-      await message.reply("You do not have enough money to buy into this game.");
-      return;
+      return message.reply("You do not have enough money to buy into this game.");
     }
   }
   account.bankroll -= stack;
   table.beginAutoDestructSequence();
-  await Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
+  return Promise.all([table.saveToDb(), account.saveToDb(), table.render()]);
 }

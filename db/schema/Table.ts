@@ -11,6 +11,7 @@ export default new Schema({
         suit: String
     }],
     channelId: String,
+    channelName: String,
     creatorId: String,
     currentBet: Number,
     currentPosition: Number,
@@ -21,6 +22,7 @@ export default new Schema({
         rank: String,
         suit: String
     }],
+    guildName: String,
     handNumber: Number,
     lastPosition: Number,
     lastRaise: Number,

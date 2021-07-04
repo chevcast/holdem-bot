@@ -33,6 +33,8 @@ export class Table extends TableBase {
   autoDestructTimeout?: NodeJS.Timeout;
   blindIncreaseInterval?: NodeJS.Timeout;
   blindIncreaseTimer: number = 0;
+  channelName?: string;
+  guildName?: string;
   prompt?: Prompt;
   sound = true;
   tournamentMode: boolean = false;
@@ -291,6 +293,7 @@ export class Table extends TableBase {
       blindIncreaseTimer: this.blindIncreaseTimer,
       buyIn: this.buyIn,
       channelId: this.channel.id,
+      channelName: this.channel.name,
       communityCards: this.communityCards.map(card => ({
         rank: card.rank,
         suit: card.suit
@@ -305,6 +308,7 @@ export class Table extends TableBase {
         rank: card.rank,
         suit: card.suit
       })),
+      guildName: this.channel.guild.name,
       handNumber: this.handNumber,
       lastPosition: this.lastPosition,
       lastRaise: this.lastRaise,
@@ -333,7 +337,7 @@ export class Table extends TableBase {
       turnTimer: this.turnTimer,
       winners: this.winners?.map(player => player.id),
     };
-    const existingTable = await Table.findByChannelId(this.channel.id);
+    const existingTable = await TableModel.findOne({ channelId: this.channel.id });
     return existingTable ? TableModel.updateOne({ channelId: this.channel.id }, doc) : TableModel.create(doc);
   }
 

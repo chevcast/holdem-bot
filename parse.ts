@@ -42,7 +42,7 @@ export default (cmdInput, context) => {
     .wrap(60);
 
   try {
-    yargs.parse(cmdInput, context, (err, argv, output) => {
+    yargs.parse(cmdInput, context, (err, argv: any, output) => {
       if (err) return onFail(err, channel);
       const { help } = argv;
       if (output) {

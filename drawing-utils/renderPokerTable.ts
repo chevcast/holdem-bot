@@ -417,7 +417,7 @@ export default async function (table: Table, currentPlayer?: Player): Promise<Bu
     ctx.fillText(line2, xCenter, y + (height - (height/4)));
   };
 
-  await drawBackground();
+  // await drawBackground();
   await drawTable();
   await drawButtons();
   await drawBets();
