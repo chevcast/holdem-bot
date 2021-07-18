@@ -14,9 +14,13 @@ export default async function (message: Message) {
     const players = table.players
       .filter(player => player !== null && player.id !== message.author.id);
     for (const player of players) {
-      const user = table.channel.guild.members.cache.get(player!.id)!.user;
-      const channel = user.dmChannel || await user.createDM();
-      channel.send(`**${member!.displayName}:** ${message.content}`, message.attachments.first());
+      try {
+        const user = table.channel.guild.members.cache.get(player!.id)!.user;
+        const channel = user.dmChannel || await user.createDM();
+        channel.send(`**${member!.displayName}:** ${message.content}`, message.attachments.first());
+      } catch (err) {
+        table.standUp(player!.id);
+      }
     }
   } else {
     // Post to all DMs.
@@ -30,9 +34,13 @@ export default async function (message: Message) {
     }
     const players = table.players.filter(player => player !== null);
     for (const player of players) {
-      const user = table.channel.guild.members.cache.get(player!.id)!.user;
-      const channel = user.dmChannel || await user.createDM();
-      channel.send(`**${message.member!.displayName}:** ${message.content}`, message.attachments.first());
+      try {
+        const user = table.channel.guild.members.cache.get(player!.id)!.user;
+        const channel = user.dmChannel || await user.createDM();
+        channel.send(`**${message.member!.displayName}:** ${message.content}`, message.attachments.first());
+      } catch (err) {
+        table.standUp(player!.id);
+      }
     }
   }
 }

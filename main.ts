@@ -29,7 +29,7 @@ const {
       parse(content.substr(COMMAND_PREFIX.length).toLowerCase(), { discord: { message } });
       return;
     }
-    chatRelay(message);
+    chatRelay(message).catch(console.log);
   });
 
   await initializeDb();
